@@ -1,9 +1,9 @@
-in vec2 v_pos;
+in vec2 v_texPos;
 
-uniform float u_red;
+uniform sampler2D u_tex;
 
 out vec4 outColor;
 
 void main() {
-    outColor = vec4(u_red, v_pos, 1);
+    outColor = texture(u_tex, v_texPos);
 }

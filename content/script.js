@@ -1,12 +1,15 @@
 function draw() {
   clearCanvas()
 
-  useProgram(program.test)
+  useProgram(programs.test)
 
-  gl.bindBuffer(gl.ARRAY_BUFFER, program.test.buffer.a_pos)
+  gl.bindBuffer(gl.ARRAY_BUFFER, programs.test.buffer.a_pos)
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([0.3, 0.3, 0.7, 0.3, 0.3, 0.7, 0.7, 0.7]), gl.DYNAMIC_DRAW)
 
-  gl.uniform1f(program.test.uniform.u_red, Math.sin(Date.now() / 1000) / 2 + 0.5)
+  gl.bindBuffer(gl.ARRAY_BUFFER, programs.test.buffer.a_texPos)
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([0, 0, 1, 0, 0, 1, 1, 1]), gl.DYNAMIC_DRAW)
+
+  useTexture(programs.test.uniform.u_tex, textures.blocks.stone_bricks, 0)
 
   gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
 }

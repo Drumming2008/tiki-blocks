@@ -1,4 +1,7 @@
 const shaderNames = ["test"]
+const imagePaths = {
+  blocks: ["stone_bricks"]
+}
 
 const canvas = document.querySelector("canvas"), gl = canvas.getContext("webgl2")
 
@@ -86,10 +89,56 @@ function useProgram(program) {
   gl.bindVertexArray(program.vao)
 }
 
-const program = {}
+const programs = {}
 for (let name of shaderNames) {
-  waitForLoad(loadShaderProgram(name).then(p => program[name] = p))
+  waitForLoad(loadShaderProgram(name).then(p => programs[name] = p))
 }
+
+// IMAGES
+
+async function loadTexture(path) {
+  let img = new Image()
+  img.src = `./assets/${path}.png`
+  await new Promise(resolve => img.onload = resolve)
+
+  let texture = gl.createTexture()
+
+  gl.activeTexture(gl.TEXTURE0)
+  gl.bindTexture(gl.TEXTURE_2D, texture)
+
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
+
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img)
+
+  return texture
+}
+
+function loadTexturesFromObj(obj, path = "") {
+  let textures = {}
+
+  if (Array.isArray(obj)) {
+    for (let file of obj) {
+      waitForLoad(loadTexture(`${path}/${file}`).then(tex => textures[file] = tex))
+    }
+  } else {
+    for (let folder in obj) {
+      textures[folder] = loadTexturesFromObj(obj[folder], `${path}/${folder}`)
+    }
+  }
+
+  return textures
+}
+
+function useTexture(uniform, texture, index, type = gl.TEXTURE_2D) {
+  gl.activeTexture(gl.TEXTURE0 + index)
+  gl.bindTexture(type, texture)
+  gl.uniform1i(uniform, index)
+}
+
+const textures = loadTexturesFromObj(imagePaths)
 
 // DRAWING
 

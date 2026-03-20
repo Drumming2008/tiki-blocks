@@ -3,7 +3,11 @@
     "a_pos": {
       "size": 2,
       "type": "FLOAT"
+    },
+    "a_texPos": {
+      "size": 2,
+      "type": "FLOAT"
     }
   },
-  "uniforms": ["u_red"]
+  "uniforms": ["u_tex"]
 }
