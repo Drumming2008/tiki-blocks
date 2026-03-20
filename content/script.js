@@ -54,5 +54,14 @@ function itemLoaded() {
 
 function waitForLoad(promise) {
   itemsToLoad++
+<<<<<<< Updated upstream
   promise.then(itemLoaded)
+=======
+
+  promise.then(() => {
+    if (++itemsLoaded == itemsToLoad) {
+      loaded()
+    }
+  })
+>>>>>>> Stashed changes
 }
