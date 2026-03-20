@@ -12,3 +12,9 @@ const createWindow = () => {
 app.whenReady().then(() => {
   createWindow()
 })
+
+onkeydown = e => {
+  if (e.code == "KeyC" && e.metaKey && e.shiftKey) {
+    win.webContents.openDevTools()
+  }
+}
