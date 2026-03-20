@@ -1,6 +1,6 @@
 const { app, BrowserWindow } = require("electron")
 
-const createWindow = () => {
+function createWindow() {
   const win = new BrowserWindow({
     width: 800,
     height: 600
@@ -9,12 +9,10 @@ const createWindow = () => {
   win.loadFile("content/index.html")
 }
 
-app.whenReady().then(() => {
-  createWindow()
-})
+app.whenReady().then(createWindow)
 
 onkeydown = e => {
-  if (e.code == "KeyC" && e.metaKey && e.shiftKey) {
+  if (e.code === "KeyC" && e.metaKey && e.shiftKey) {
     win.webContents.openDevTools()
   }
 }
