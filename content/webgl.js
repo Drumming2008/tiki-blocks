@@ -1,6 +1,6 @@
 const shaderNames = ["test", "block"]
 const imagePaths = {
-  blocks: ["stone_bricks", "dirt", "rocky_dirt"]
+  blocks: ["stone_bricks", "dirt", "rocky_dirt", "grass_top"]
 }
 
 const canvas = document.querySelector("canvas"), gl = canvas.getContext("webgl2")
@@ -185,7 +185,7 @@ function textureLoaded(data, z) {
 
 // DRAWING
 
-gl.clearColor(0, 0, 0, 1)
+gl.clearColor(0.714, 0.835, 0.961, 1)
 
 function clearCanvas() {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
