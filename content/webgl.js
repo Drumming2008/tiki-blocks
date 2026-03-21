@@ -1,6 +1,6 @@
 const shaderNames = ["test", "block"]
 const imagePaths = {
-  blocks: ["stone_bricks"]
+  blocks: ["stone_bricks", "dirt", "rocky_dirt"]
 }
 
 const canvas = document.querySelector("canvas"), gl = canvas.getContext("webgl2")
