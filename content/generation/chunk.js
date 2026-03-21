@@ -15,7 +15,7 @@ function computeFaces({ blocks, heightmap }) {
       let layerIndex = x + z * CHUNK_SIZE
       let height = heightmap[layerIndex]
 
-      for (let y = 0; y < height; y++) {
+      for (let y = 0; y <= height; y++) {
         let i = layerIndex + y * CHUNK_LAYER_LEN
         let block = blocks[i], data = blocksById[block]
 
@@ -25,7 +25,7 @@ function computeFaces({ blocks, heightmap }) {
         let blockData = blockDataXZ | y
         let blockDataSide = blockData | texSide << 24
 
-        if (y === height - 1 || isTransparent(blocks[i + CHUNK_LAYER_LEN])) {
+        if (y === height || isTransparent(blocks[i + CHUNK_LAYER_LEN])) {
           let texTop = blockTextureIndices[data.textureTop] ?? texSide
           py.push(blockData | texTop << 24)
         }
@@ -63,14 +63,29 @@ function generateChunk(chunkX, chunkZ) {
 
     for (let z = 0; z < CHUNK_SIZE; z++) {
       let worldZ = z + chunkZ * CHUNK_SIZE
-
       let layerIndex = x + z * CHUNK_SIZE
+
+      let dist = Math.hypot(x - 16, z - 16)
+      if (chunkX % 10 === 2 && chunkZ % 10 === 2 && dist < 14) {
+        let height = heightmap[layerIndex] = dist < 13 ? 250 : 255
+        for (let y = 0; y < height; y++) {
+          blocks[layerIndex + y * CHUNK_LAYER_LEN] = 254
+        }
+        if (x === 16 && z === 16) {
+          heightmap[layerIndex] += 3
+          blocks[layerIndex + 250 * CHUNK_LAYER_LEN] = 1
+          blocks[layerIndex + 251 * CHUNK_LAYER_LEN] = 1
+          blocks[layerIndex + 252 * CHUNK_LAYER_LEN] = 255
+        }
+        continue
+      }
+
       let height = Math.round(getHeight(worldX, worldZ))
       heightmap[layerIndex] = height
 
-      for (let y = 0; y < height; y++) {
+      for (let y = 0; y <= height; y++) {
         let block = 1
-        if (y === height - 1) {
+        if (y === height) {
           let noise = Math.sin(worldX / 13) + Math.sin(worldZ / 13)
           let slope = getSlope(worldX, worldZ) + noise / 4
           if (slope < 0.3) block = 2

@@ -26,6 +26,16 @@ const blocks = [
     id: 4,
     name: "Rocky Dirt",
     texture: "rocky_dirt"
+  },
+  {
+    id: 254,
+    name: "Cheese Bricks",
+    texture: "cheese_bricks"
+  },
+  {
+    id: 255,
+    name: "Cheese",
+    texture: "cheese"
   }
 ]
 

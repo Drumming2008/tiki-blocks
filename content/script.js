@@ -72,7 +72,7 @@ function draw() {
       `Chunks: ${loadedChunks.size} loaded, ${chunks.size} total`,
       `Chunk: ${getChunkAt(camX, camZ)} (Pos in chunk: ${wrapPosToChunkSize(camX, camY, camZ).join(", ")})`,
       "",
-      `Block: ${blocksById[getBlockIdAt(camX, camY, camZ)].stringId}`
+      `Block: ${blocksById[getBlockIdAt(camX, camY, camZ)].name}`
     ].join("\n")
   }
 
