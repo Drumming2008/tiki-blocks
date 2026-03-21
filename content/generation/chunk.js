@@ -1,6 +1,6 @@
 importScripts("../blocks.js")
 
-function computeFaces({ data, heightmap }) {
+function computeFaces({ blocks, heightmap }) {
   let py = [], ny = [], px = [], nx = [], pz = [], nz = []
 
   // see shaders/block.vsh
@@ -17,27 +17,27 @@ function computeFaces({ data, heightmap }) {
 
       for (let y = 0; y < height; y++) {
         let i = layerIndex + y * CHUNK_LAYER_LEN
-        let block = data[i]
+        let block = blocks[i]
 
         if (isFullBlock(block)) {
           let blockData = blockDataXZ | y
 
-          if (y === height - 1 || isTransparent(data[i + CHUNK_LAYER_LEN])) {
+          if (y === height - 1 || isTransparent(blocks[i + CHUNK_LAYER_LEN])) {
             py.push(blockData)
           }
-          if (y > 0 && isTransparent(data[i - CHUNK_LAYER_LEN])) {
+          if (y > 0 && isTransparent(blocks[i - CHUNK_LAYER_LEN])) {
             ny.push(blockData | 1 << 18)
           }
-          if (x < CHUNK_SIZE - 1 && isTransparent(data[i + 1])) {
+          if (x < CHUNK_SIZE - 1 && isTransparent(blocks[i + 1])) {
             px.push(blockData | 2 << 18)
           }
-          if (x > 0 && isTransparent(data[i - 1])) {
+          if (x > 0 && isTransparent(blocks[i - 1])) {
             nx.push(blockData | 3 << 18)
           }
-          if (z < CHUNK_SIZE - 1 && isTransparent(data[i + CHUNK_SIZE])) {
+          if (z < CHUNK_SIZE - 1 && isTransparent(blocks[i + CHUNK_SIZE])) {
             pz.push(blockData | 4 << 18)
           }
-          if (z > 0 && isTransparent(data[i - CHUNK_SIZE])) {
+          if (z > 0 && isTransparent(blocks[i - CHUNK_SIZE])) {
             nz.push(blockData | 5 << 18)
           }
         } else {
@@ -54,7 +54,7 @@ function computeFaces({ data, heightmap }) {
 }
 
 function generateChunk(chunkX, chunkZ) {
-  let data = new Uint8Array(CHUNK_LEN), heightmap = new Uint8Array(CHUNK_LAYER_LEN)
+  let blocks = new Uint8Array(CHUNK_LEN), heightmap = new Uint8Array(CHUNK_LAYER_LEN)
 
   for (let x = 0; x < CHUNK_SIZE; x++) {
     let worldX = x + chunkX * CHUNK_SIZE
@@ -67,12 +67,12 @@ function generateChunk(chunkX, chunkZ) {
       heightmap[layerIndex] = height
 
       for (let y = 0; y < height; y++) {
-        data[layerIndex + y * CHUNK_LAYER_LEN] = 1
+        blocks[layerIndex + y * CHUNK_LAYER_LEN] = 1
       }
     }
   }
 
-  return { data, heightmap }
+  return { blocks, heightmap }
 }
 
 function getHeight(x, z) {
