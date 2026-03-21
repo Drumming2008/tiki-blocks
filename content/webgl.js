@@ -73,17 +73,20 @@ async function loadShaderProgram(name) {
   let attrib = {}, buffer = {}, uniform = {}
 
   for (let name in attributes) {
-    let { size, type, int } = attributes[name]
-
-    let buff = buffer[name] = gl.createBuffer()
-    gl.bindBuffer(gl.ARRAY_BUFFER, buff)
+    let { size, type, int, buffer: doBuffer } = attributes[name]
 
     let attr = attrib[name] = gl.getAttribLocation(program, name)
     gl.enableVertexAttribArray(attr)
-    if (int) {
-      gl.vertexAttribIPointer(attr, size, gl[type], 0, 0)
-    } else {
-      gl.vertexAttribPointer(attr, size, gl[type], false, 0, 0)
+
+    if (doBuffer ?? true) {
+      let buff = buffer[name] = gl.createBuffer()
+      gl.bindBuffer(gl.ARRAY_BUFFER, buff)
+
+      if (int) {
+        gl.vertexAttribIPointer(attr, size, gl[type], 0, 0)
+      } else {
+        gl.vertexAttribPointer(attr, size, gl[type], false, 0, 0)
+      }
     }
   }
 

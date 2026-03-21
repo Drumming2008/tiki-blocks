@@ -32,7 +32,7 @@ void main() {
     int z    = data & 31;  data >>= 5;
     int face = data & 7;   data >>= 3;
     int rot  = data & 7;   data >>= 3;
-    int tex  = data;
+    int tex  = data & 255;
 
     ivec3 pos = ivec3(x + u_offset.x, y, z + u_offset.y);
 

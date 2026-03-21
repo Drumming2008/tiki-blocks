@@ -3,7 +3,7 @@ const { mat4, glMatrix } = window.glMatrix
 const debugElem = document.getElementById("debug")
 let showDebug = false
 
-let camera = { x: -0.5, y: 3.5, z: 4, yaw: glMatrix.toRadian(30), pitch: glMatrix.toRadian(30) }
+let camera = { x: -0.5, y: 15, z: 4, yaw: glMatrix.toRadian(30), pitch: glMatrix.toRadian(30) }
 
 let keysDown = {}
 onkeydown = e => {
@@ -56,6 +56,8 @@ function setup() {
   gl.bindBuffer(gl.ARRAY_BUFFER, programs.block.buffer.a_corner)
   gl.bufferData(gl.ARRAY_BUFFER, new Int8Array([0, 1, 3, 2]), gl.STATIC_DRAW)
   gl.vertexAttribDivisor(programs.block.attrib.a_data, 1)
+
+  loadChunksAround(0, 0, 5)
 }
 
 const viewMat = mat4.create()
@@ -72,18 +74,6 @@ function draw() {
 
   useProgram(programs.block)
 
-  gl.bindBuffer(gl.ARRAY_BUFFER, programs.block.buffer.a_data)
-  gl.bufferData(gl.ARRAY_BUFFER, new Int32Array([
-    block(0, 0, 0),
-    block(0, 1, 0),
-    block(0, 2, 0),
-    block(1, 2, 0),
-    block(2, 2, 0),
-    block(2, 1, 0),
-    block(2, 0, 0),
-    block(1, 0, 0)
-  ].flat()), gl.DYNAMIC_DRAW)
-
   useTexture(programs.block.uniform.u_tex, textures.blocks.stone_bricks, 0)
 
   mat4.fromXRotation(viewMat, camera.pitch)
@@ -93,22 +83,17 @@ function draw() {
   gl.uniformMatrix4fv(programs.block.uniform.u_projectionMat, false, projectionMat)
   gl.uniformMatrix4fv(programs.block.uniform.u_viewMat, false, viewMat)
 
-  gl.uniform2i(programs.block.uniform.u_offset, 0, 0)
+  for (let key of loadedChunks) {
+    let chunk = chunks.get(key)
+    if (chunk.loading) continue
 
-  gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, 6 * 8)
-}
+    gl.uniform2i(programs.block.uniform.u_offset, chunk.x * CHUNK_SIZE, chunk.z * CHUNK_SIZE)
 
-// temporary
-function block(x, y, z) {
-  let pos = (z << 5 | x) << 8 | y
-  return [
-    pos,
-    pos | 1 << 18,
-    pos | 2 << 18,
-    pos | 3 << 18,
-    pos | 4 << 18,
-    pos | 5 << 18
-  ]
+    gl.bindBuffer(gl.ARRAY_BUFFER, chunk.faces.buffer)
+    gl.vertexAttribIPointer(programs.block.attrib.a_data, 1, gl.INT, 0, 0)
+
+    gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, chunk.faces.data.length)
+  }
 }
 
 function loaded() {
@@ -130,7 +115,10 @@ function itemLoaded() {
   }
 }
 
-function waitForLoad(promise) {
+function waitForLoad(promise = null) {
   itemsToLoad++
-  promise.then(itemLoaded)
+  promise?.then(itemLoaded)
 }
+
+waitForLoad()
+onload = itemLoaded

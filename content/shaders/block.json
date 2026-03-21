@@ -3,7 +3,8 @@
     "a_data": {
       "size": 1,
       "type": "INT",
-      "int": true
+      "int": true,
+      "buffer": false
     },
     "a_corner": {
       "size": 1,
