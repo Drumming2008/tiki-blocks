@@ -35,3 +35,29 @@ canvas {
 #debug.show {
   display: block;
 }
+
+#hud {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+ui-div {
+  --border-size: 8px;
+
+  position: absolute;
+
+  border: var(--border-size) solid transparent;
+
+  border-image-source: url("./assets/ui/gray.png");
+  border-image-slice: 1 fill;
+  border-image-width: var(--border-size);
+  border-image-repeat: stretch;
+}
+
+#hotbar {
+  bottom: 10px;
+  left: 100px;
+  right: 100px;
+  height: 50px;
+}
