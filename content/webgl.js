@@ -65,38 +65,37 @@ async function loadShaderProgram(name) {
     return
   }
 
-  program.vao = gl.createVertexArray()
+  gl.useProgram(program)
 
-  useProgram(program)
+  let vao = gl.createVertexArray()
+  gl.bindVertexArray(vao)
 
-  program.attrib = {}
-  program.uniform = {}
-  program.buffer = {}
+  let attrib = {}, buffer = {}, uniform = {}
 
   for (let name in attributes) {
     let { size, type, int } = attributes[name]
 
-    let attrib = program.attrib[name] = gl.getAttribLocation(program, name)
-    let buffer = program.buffer[name] = gl.createBuffer()
+    let buff = buffer[name] = gl.createBuffer()
+    gl.bindBuffer(gl.ARRAY_BUFFER, buff)
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
-    gl.enableVertexAttribArray(attrib)
+    let attr = attrib[name] = gl.getAttribLocation(program, name)
+    gl.enableVertexAttribArray(attr)
     if (int) {
-      gl.vertexAttribIPointer(attrib, size, gl[type], 0, 0)
+      gl.vertexAttribIPointer(attr, size, gl[type], 0, 0)
     } else {
-      gl.vertexAttribPointer(attrib, size, gl[type], false, 0, 0)
+      gl.vertexAttribPointer(attr, size, gl[type], false, 0, 0)
     }
   }
 
   for (let name of uniforms) {
-    program.uniform[name] = gl.getUniformLocation(program, name)
+    uniform[name] = gl.getUniformLocation(program, name)
   }
 
-  return program
+  return { program, vao, attrib, buffer, uniform }
 }
 
 function useProgram(program) {
-  gl.useProgram(program)
+  gl.useProgram(program.program)
   gl.bindVertexArray(program.vao)
 }
 
@@ -107,11 +106,17 @@ for (let name of shaderNames) {
 
 // IMAGES
 
-async function loadTexture(path) {
+function loadImage(path) {
   let img = new Image()
   img.src = `./assets/${path}.png`
-  await new Promise(resolve => img.onload = resolve)
 
+  return new Promise(resolve => {
+    img.onload = () => resolve(img)
+  })
+}
+
+async function loadTexture(path) {
+  let img = await loadImage(path)
   let texture = gl.createTexture()
 
   gl.activeTexture(gl.TEXTURE0)
@@ -195,4 +200,4 @@ function blend(enable) {
 
 gl.enable(gl.DEPTH_TEST)
 
-// gl.enable(gl.CULL_FACE)
+gl.enable(gl.CULL_FACE)
