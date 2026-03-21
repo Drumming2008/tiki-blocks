@@ -1,5 +1,8 @@
 const { mat4, glMatrix } = window.glMatrix
 
+const debugElem = document.getElementById("debug")
+let showDebug = false
+
 let camera = { x: -0.5, y: 3.5, z: 4, yaw: glMatrix.toRadian(30), pitch: glMatrix.toRadian(30) }
 
 let keysDown = {}
@@ -18,6 +21,10 @@ function processKeys() {
   if (keysDown.ArrowRight) camera.yaw += LOOK_SPEED
   if (keysDown.ArrowLeft) camera.yaw -= LOOK_SPEED
 
+  camera.pitch = clamp(camera.pitch, -Math.PI / 2, Math.PI / 2)
+  camera.yaw %= 2 * Math.PI
+  while (camera.yaw < 0) camera.yaw += 2 * Math.PI
+
   if (keysDown.Space) camera.y += MOVE_SPEED
   if (keysDown.ShiftLeft) camera.y -= MOVE_SPEED
 
@@ -33,6 +40,10 @@ function processKeys() {
   let sin = Math.sin(camera.yaw), cos = Math.cos(camera.yaw)
   camera.x += right * cos + fwd * sin
   camera.z += right * sin - fwd * cos
+
+  if (keysDown.Backquote === "press") {
+    debugElem.classList.toggle("show", showDebug = !showDebug)
+  }
 
   for (let i in keysDown) {
     keysDown[i] &&= true
@@ -50,6 +61,13 @@ function setup() {
 const viewMat = mat4.create()
 
 function draw() {
+  if (showDebug) {
+    debugElem.innerText = [
+      `Pos: ${camera.x.toFixed(2)}, ${camera.y.toFixed(4)}, ${camera.z.toFixed(2)}`,
+      `Yaw: ${glMatrix.toDegree(camera.yaw).toFixed(1)}, Pitch: ${glMatrix.toDegree(camera.pitch).toFixed(1)}`
+    ].join("\n")
+  }
+
   clearCanvas()
 
   useProgram(programs.block)
