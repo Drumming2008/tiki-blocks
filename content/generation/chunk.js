@@ -88,7 +88,7 @@ function generateChunk(chunkX, chunkZ) {
       blocks[layerIndex] = Block.BEDROCK
 
       for (let y = 1; y <= height; y++) {
-        let block = Block.STONE_BRICKS
+        let block = Block.STONE
         if (y === height) {
           let noise = Math.sin(worldX / 13) + Math.sin(worldZ / 13)
           let slope = getSlope(worldX, worldZ) + noise / 4
