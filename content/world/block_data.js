@@ -32,10 +32,10 @@ const rawBlocks = {
     name: "Bedrock (cheeserock)",
     texture: "bedrock"
   },
-  CHEESE_BRICKS: {
-    id: 254,
-    name: "Cheese Bricks",
-    texture: "cheese_bricks"
+  STONE: {
+    id: 5,
+    name: "Stone",
+    texture: "stone"
   },
   CHEESE: {
     id: 255,
