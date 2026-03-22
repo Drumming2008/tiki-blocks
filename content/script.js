@@ -5,17 +5,53 @@ let showDebug = false
 
 let camera = { x: -4, y: 40, z: 27, yaw: glMatrix.toRadian(325), pitch: glMatrix.toRadian(25) }
 
-document.body.addEventListener("click", () => {
-  canvas.requestPointerLock().then(() => { pointerLocked = true })
+let paused = true
+function pause() {
+  paused = true
+  id("pause-menu").style.display = ""
+}
+
+function unpause() {
+  paused = false
+  id("pause-menu").style.display = "none"
+  canvas.requestPointerLock().then(() => { console.log("pointer locked") })
   .catch(error => {
+    console.error(error)
   })
+}
+
+function togglePause() {
+  if (paused) unpause()
+  else pause()
+}
+
+window.api.onPause(() => {
+  console.log("PAUSEEE")
+  if (document.pointerLockElement) {
+    document.exitPointerLock()
+  }
+
+  pause()
 })
+
+id("resume").onclick = () => {
+  unpause()
+}
+
+addEventListener("pointerlockchange", () => {
+  if (document.pointerLockElement) {
+    unpause()
+  } else {
+    pause()
+  }
+})
+
+onblur = pause
 
 let sensitivity = 0.005
 
 onmousemove = e => {
   if (document.pointerLockElement) {
-    console.log(e)
     camera.pitch += e.movementY * sensitivity
     camera.yaw += e.movementX * sensitivity
   }
@@ -24,6 +60,12 @@ onmousemove = e => {
 let keysDown = {}
 onkeydown = e => {
   if (!e.metaKey) keysDown[e.code] = "press"
+
+  if (e.code == "Escape") {
+    e.preventDefault()
+    console.log("SDLKJFHLKSJDHFLKJSDH")
+    togglePause()
+  }
 }
 
 onkeyup = e => {

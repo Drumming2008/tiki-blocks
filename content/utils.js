@@ -14,3 +14,7 @@ const FACE_BUFFER_PADDING = CHUNK_SIZE * 2
 function clamp(x, min, max) {
   return Math.max(min, Math.min(max, x))
 }
+
+function id(id) {
+  return document.getElementById(id)
+}

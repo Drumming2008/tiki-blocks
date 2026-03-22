@@ -79,7 +79,6 @@ canvas {
 }
 
 ui-div {
-
   position: absolute;
 }
 
@@ -99,7 +98,4 @@ ui-div {
   gap: calc(var(--ui-px) * 2);
   justify-content: center;
   align-items: center;
-
-  /* temporary */
-  display: none;
 }
