@@ -5,6 +5,22 @@ let showDebug = false
 
 let camera = { x: -4, y: 40, z: 27, yaw: glMatrix.toRadian(325), pitch: glMatrix.toRadian(25) }
 
+document.body.addEventListener("click", () => {
+  canvas.requestPointerLock().then(() => { pointerLocked = true })
+  .catch(error => {
+  })
+})
+
+let sensitivity = 0.005
+
+onmousemove = e => {
+  if (document.pointerLockElement) {
+    console.log(e)
+    camera.pitch += e.movementY * sensitivity
+    camera.yaw += e.movementX * sensitivity
+  }
+}
+
 let keysDown = {}
 onkeydown = e => {
   if (!e.metaKey) keysDown[e.code] = "press"
