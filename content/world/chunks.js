@@ -78,9 +78,13 @@ async function loadChunk(x, z) {
   chunk.x = x
   chunk.z = z
 
-  let buffer = chunk.faces.buffer = gl.createBuffer()
-  gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
-  gl.bufferData(gl.ARRAY_BUFFER, chunk.faces.data, gl.STATIC_DRAW)
+  chunk.faces.posBuffer = gl.createBuffer()
+  gl.bindBuffer(gl.ARRAY_BUFFER, chunk.faces.posBuffer)
+  gl.bufferData(gl.ARRAY_BUFFER, chunk.faces.posData, gl.STATIC_DRAW)
+
+  chunk.faces.negBuffer = gl.createBuffer()
+  gl.bindBuffer(gl.ARRAY_BUFFER, chunk.faces.negBuffer)
+  gl.bufferData(gl.ARRAY_BUFFER, chunk.faces.negData, gl.STATIC_DRAW)
 }
 
 let messageReceivedCallbacks = new Map(), messageReceivedCallbackId = 0
@@ -115,4 +119,37 @@ function receiveMessage({ data: { id, data } }) {
 
 function chunkKey(x, z) {
   return `${x}:${z}`
+}
+
+function drawChunks() {
+  let [camX, camZ] = getChunkAt(camera.x, camera.z)
+
+  for (let key of loadedChunks) {
+    let chunk = chunks.get(key)
+    if (chunk.loading) continue
+
+    let { indices, posBuffer, negBuffer } = chunk.faces
+
+    gl.uniform2i(programs.block.uniform.u_offset, chunk.x * CHUNK_SIZE, chunk.z * CHUNK_SIZE)
+
+    let px = chunk.x <= camX, pz = chunk.z <= camZ
+    let posStart = px ? indices.px : indices.py
+    let posEnd = pz ? indices.pEnd : indices.pz
+    let posCount = posEnd - posStart
+    if (posCount) {
+      gl.bindBuffer(gl.ARRAY_BUFFER, posBuffer)
+      gl.vertexAttribIPointer(programs.block.attrib.a_data, 1, gl.INT, 0, posStart * 4)
+      gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, posCount)
+    }
+
+    let nx = chunk.x >= camX, nz = chunk.z >= camZ
+    let negStart = nx ? indices.nx : indices.ny
+    let negEnd = nz ? indices.nEnd : indices.nz
+    let negCount = negEnd - negStart
+    if (negCount) {
+      gl.bindBuffer(gl.ARRAY_BUFFER, negBuffer)
+      gl.vertexAttribIPointer(programs.block.attrib.a_data, 1, gl.INT, 0, negStart * 4)
+      gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, negCount)
+    }
+  }
 }

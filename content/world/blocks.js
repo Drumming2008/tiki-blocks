@@ -1,6 +1,6 @@
 const BLOCK_TEXTURE_SIZE = 16
 
-let blockTextureIndices = {} // name -> index
+let blockTextureIndices = {} // texture name -> index
 
 let blockTextures = new Set(blocks.flatMap(b => [b.texture, b.textureTop, b.textureBottom]))
 blockTextures.delete(undefined)

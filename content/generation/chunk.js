@@ -1,5 +1,7 @@
 importScripts("../world/block_data.js")
 
+const paddingArray = Array(FACE_BUFFER_PADDING).fill(0)
+
 function computeFaces({ blocks, heightmap }) {
   let py = [], ny = [], px = [], nx = [], pz = [], nz = []
 
@@ -49,9 +51,16 @@ function computeFaces({ blocks, heightmap }) {
     }
   }
 
+  let pxIndex = FACE_BUFFER_PADDING, pyIndex = pxIndex + px.length, pzIndex = pyIndex + py.length, pEndIndex = pzIndex + pz.length
+  let nxIndex = FACE_BUFFER_PADDING, nyIndex = nxIndex + nx.length, nzIndex = nyIndex + ny.length, nEndIndex = nzIndex + nz.length
+
   return {
-    data: new Int32Array(px.concat(py, pz, nx, ny, nz)),
-    lengths: [px.length, py.length, pz.length, nx.length, ny.length, nz.length]
+    posData: new Int32Array(paddingArray.concat(px, py, pz, paddingArray)),
+    negData: new Int32Array(paddingArray.concat(nx, ny, nz, paddingArray)),
+    indices: {
+      px: pxIndex, py: pyIndex, pz: pzIndex, pEnd: pEndIndex,
+      nx: nxIndex, ny: nyIndex, nz: nzIndex, nEnd: nEndIndex
+    }
   }
 }
 

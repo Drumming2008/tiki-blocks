@@ -77,12 +77,20 @@ function setup() {
 
 const viewMat = mat4.create()
 
+let lastFrameTimes = []
+
 function draw() {
+  let now = performance.now()
+  while (now - lastFrameTimes[0] >= 1000) lastFrameTimes.shift()
+  lastFrameTimes.push(now)
+
   if (showDebug) {
     let camX = Math.floor(camera.x), camY = Math.floor(camera.y), camZ = Math.floor(camera.z)
     let blockId = getBlockIdAt(camX, camY, camZ)
 
     debugElem.innerText = [
+      `${lastFrameTimes.length} FPS`,
+      "",
       `Pos: ${camera.x.toFixed(2)}, ${camera.y.toFixed(4)}, ${camera.z.toFixed(2)} (Block: ${camX}, ${camY}, ${camZ})`,
       `Yaw: ${glMatrix.toDegree(camera.yaw).toFixed(1)}, Pitch: ${glMatrix.toDegree(camera.pitch).toFixed(1)}`,
       "",
@@ -109,17 +117,7 @@ function draw() {
   gl.uniformMatrix4fv(programs.block.uniform.u_projectionMat, false, projectionMat)
   gl.uniformMatrix4fv(programs.block.uniform.u_viewMat, false, viewMat)
 
-  for (let key of loadedChunks) {
-    let chunk = chunks.get(key)
-    if (chunk.loading) continue
-
-    gl.uniform2i(programs.block.uniform.u_offset, chunk.x * CHUNK_SIZE, chunk.z * CHUNK_SIZE)
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, chunk.faces.buffer)
-    gl.vertexAttribIPointer(programs.block.attrib.a_data, 1, gl.INT, 0, 0)
-
-    gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, chunk.faces.data.length)
-  }
+  drawChunks()
 }
 
 function loaded() {
