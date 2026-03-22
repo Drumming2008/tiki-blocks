@@ -93,7 +93,7 @@ function generateChunk(chunkX, chunkZ) {
           let noise = Math.sin(worldX / 13) + Math.sin(worldZ / 13)
           let slope = getSlope(worldX, worldZ) + noise / 4
           if (slope < 0.3) block = Block.GRASS
-          else if (slope < 0.5) block = noise > 0.5 ? Block.ROCKY_DIRT : Block.DIRT
+          else if (slope < 0.5) block = noise > 0.5 ? Block.GRAVEL : Block.DIRT
           else if (slope < 0.6) block = Block.ROCKY_DIRT
         }
         blocks[layerIndex + y * CHUNK_LAYER_LEN] = block
