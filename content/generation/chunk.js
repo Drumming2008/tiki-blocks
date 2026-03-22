@@ -65,32 +65,36 @@ function generateChunk(chunkX, chunkZ) {
       let worldZ = z + chunkZ * CHUNK_SIZE
       let layerIndex = x + z * CHUNK_SIZE
 
+      // begin cheese monolith shenanigans
       let dist = Math.hypot(x - 16, z - 16)
       if (chunkX % 10 === 2 && chunkZ % 10 === 2 && dist < 14) {
         let height = heightmap[layerIndex] = dist < 13 ? 250 : 255
         for (let y = 0; y < height; y++) {
-          blocks[layerIndex + y * CHUNK_LAYER_LEN] = 254
+          blocks[layerIndex + y * CHUNK_LAYER_LEN] = Block.CHEESE_BRICKS
         }
         if (x === 16 && z === 16) {
           heightmap[layerIndex] += 3
-          blocks[layerIndex + 250 * CHUNK_LAYER_LEN] = 1
-          blocks[layerIndex + 251 * CHUNK_LAYER_LEN] = 1
-          blocks[layerIndex + 252 * CHUNK_LAYER_LEN] = 255
+          blocks[layerIndex + 250 * CHUNK_LAYER_LEN] = Block.STONE_BRICKS
+          blocks[layerIndex + 251 * CHUNK_LAYER_LEN] = Block.STONE_BRICKS
+          blocks[layerIndex + 252 * CHUNK_LAYER_LEN] = Block.CHEESE
         }
         continue
       }
+      // end cheese monolith shenanigans
 
-      let height = Math.round(getHeight(worldX, worldZ))
+      let height = Math.max(0, Math.round(getHeight(worldX, worldZ)))
       heightmap[layerIndex] = height
 
-      for (let y = 0; y <= height; y++) {
-        let block = 1
+      blocks[layerIndex] = Block.BEDROCK
+
+      for (let y = 1; y <= height; y++) {
+        let block = Block.STONE_BRICKS
         if (y === height) {
           let noise = Math.sin(worldX / 13) + Math.sin(worldZ / 13)
           let slope = getSlope(worldX, worldZ) + noise / 4
-          if (slope < 0.3) block = 2
-          else if (slope < 0.5) block = noise > 0.5 ? 4 : 3
-          else if (slope < 0.6) block = 4
+          if (slope < 0.3) block = Block.GRASS
+          else if (slope < 0.5) block = noise > 0.5 ? Block.ROCKY_DIRT : Block.DIRT
+          else if (slope < 0.6) block = Block.ROCKY_DIRT
         }
         blocks[layerIndex + y * CHUNK_LAYER_LEN] = block
       }
@@ -101,6 +105,7 @@ function generateChunk(chunkX, chunkZ) {
 }
 
 function getHeight(x, z) {
+  // temporary
   return (Math.sin(x / 50) + Math.sin(z / 50)) * 15 + (Math.sin(x / 10) + Math.sin(z / 10)) * 4 + 20
 }
 // temporary

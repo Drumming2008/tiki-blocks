@@ -64,6 +64,7 @@ const viewMat = mat4.create()
 function draw() {
   if (showDebug) {
     let camX = Math.floor(camera.x), camY = Math.floor(camera.y), camZ = Math.floor(camera.z)
+    let blockId = getBlockIdAt(camX, camY, camZ)
 
     debugElem.innerText = [
       `Pos: ${camera.x.toFixed(2)}, ${camera.y.toFixed(4)}, ${camera.z.toFixed(2)} (Block: ${camX}, ${camY}, ${camZ})`,
@@ -72,7 +73,7 @@ function draw() {
       `Chunks: ${loadedChunks.size} loaded, ${chunks.size} total`,
       `Chunk: ${getChunkAt(camX, camZ)} (Pos in chunk: ${wrapPosToChunkSize(camX, camY, camZ).join(", ")})`,
       "",
-      `Block: ${blocksById[getBlockIdAt(camX, camY, camZ)].name}`
+      `Block: ${blockId !== null ? blocksById[blockId].name : "<none>"}`
     ].join("\n")
   }
 
