@@ -129,7 +129,7 @@ function draw() {
       `Yaw: ${glMatrix.toDegree(camera.yaw).toFixed(1)}, Pitch: ${glMatrix.toDegree(camera.pitch).toFixed(1)}`,
       "",
       `Chunks: ${loadedChunks.size} loaded, ${chunks.size} total`,
-      `Chunk: ${getChunkAt(camX, camZ)} (Pos in chunk: ${wrapPosToChunkSize(camX, camY, camZ).join(", ")})`,
+      `Chunk: ${getChunkPos(camX, camZ).join(", ")} (Pos in chunk: ${wrapPosToChunkSize(camX, camY, camZ).join(", ")})`,
       "",
       `Block: ${blockId !== null ? blocksById[blockId].name : "<none>"}`
     ].join("\n")

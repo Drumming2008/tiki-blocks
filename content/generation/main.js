@@ -12,7 +12,7 @@ onmessage = ({ data: { id, type, data } }) => {
 
     postMessage(
       { id, data: chunk },
-      { transfer: [chunk.faces.posData.buffer, chunk.faces.negData.buffer] }
+      { transfer: [chunk.blocks.buffer, chunk.heightmap.buffer, chunk.faces.posData.buffer, chunk.faces.negData.buffer] }
     )
   } else {
     console.error(`Unknown message type sent to worker '${type}'`, data)

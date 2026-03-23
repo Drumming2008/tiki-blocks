@@ -5,7 +5,6 @@ const paddingArray = Array(FACE_BUFFER_PADDING).fill(0)
 function computeFaces({ blocks, heightmap }) {
   let py = [], ny = [], px = [], nx = [], pz = [], nz = []
 
-  // see shaders/block.vsh
   // tttttttt 0rrfffzz zzzxxxxx yyyyyyyy
 
   for (let x = 0; x < CHUNK_SIZE; x++) {
@@ -19,8 +18,7 @@ function computeFaces({ blocks, heightmap }) {
 
       for (let y = 0; y <= height; y++) {
         let i = layerIndex + y * CHUNK_LAYER_LEN
-        let block = blocks[i], data = blocksById[block]
-
+        let data = blocksById[blocks[i]]
         if (data.invisible) continue
 
         let texSide = blockTextureIndices[data.texture]
@@ -51,15 +49,12 @@ function computeFaces({ blocks, heightmap }) {
     }
   }
 
-  let pxIndex = FACE_BUFFER_PADDING, pyIndex = pxIndex + px.length, pzIndex = pyIndex + py.length, pEndIndex = pzIndex + pz.length
-  let nxIndex = FACE_BUFFER_PADDING, nyIndex = nxIndex + nx.length, nzIndex = nyIndex + ny.length, nEndIndex = nzIndex + nz.length
-
   return {
-    posData: new Int32Array(paddingArray.concat(px, py, pz, paddingArray)),
-    negData: new Int32Array(paddingArray.concat(nx, ny, nz, paddingArray)),
-    indices: {
-      px: pxIndex, py: pyIndex, pz: pzIndex, pEnd: pEndIndex,
-      nx: nxIndex, ny: nyIndex, nz: nzIndex, nEnd: nEndIndex
+    posData: new Int32Array(px.concat(py, pz, paddingArray)),
+    negData: new Int32Array(nx.concat(ny, nz, paddingArray)),
+    lengths: {
+      pos: { x: px.length, y: py.length, z: pz.length, padding: FACE_BUFFER_PADDING },
+      neg: { x: nx.length, y: ny.length, z: nz.length, padding: FACE_BUFFER_PADDING }
     }
   }
 }
