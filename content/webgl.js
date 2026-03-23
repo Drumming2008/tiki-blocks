@@ -184,7 +184,7 @@ function useTexture(uniform, texture, index, type = gl.TEXTURE_2D) {
 
 // DRAWING
 
-gl.clearColor(0.714, 0.835, 0.961, 1)
+gl.clearColor(0, 0, 0, 0)
 
 function clearCanvas() {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
