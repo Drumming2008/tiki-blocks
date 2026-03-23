@@ -5,13 +5,18 @@ let showDebug = false
 
 let camera = { x: -4, y: 40, z: 27, yaw: glMatrix.toRadian(325), pitch: glMatrix.toRadian(25) }
 
-let paused = true
+let paused = true, waitingToLock = false
+
 function pause() {
   paused = true
   id("pause-menu").style.display = ""
 }
 
 function unpause() {
+  enterPointerLock()
+}
+
+function enterPointerLock() {
   canvas.requestPointerLock().then(() => {
     paused = false
     id("pause-menu").style.display = "none"
@@ -22,8 +27,10 @@ function unpause() {
 }
 
 function togglePause() {
-  if (paused) unpause()
-  else pause()
+  enterPointerLock()
+  if (paused) {
+    id("pause-menu").style.display = "none"
+  } else pause()
 }
 
 id("resume").onclick = () => {
