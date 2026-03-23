@@ -12,9 +12,10 @@ function pause() {
 }
 
 function unpause() {
-  paused = false
-  id("pause-menu").style.display = "none"
-  canvas.requestPointerLock().then(() => { console.log("pointer locked") })
+  canvas.requestPointerLock().then(() => {
+    paused = false
+    id("pause-menu").style.display = "none"
+  })
   .catch(error => {
     console.error(error)
   })
@@ -25,20 +26,11 @@ function togglePause() {
   else pause()
 }
 
-window.api.onPause(() => {
-  console.log("PAUSEEE")
-  if (document.pointerLockElement) {
-    document.exitPointerLock()
-  }
-
-  pause()
-})
-
 id("resume").onclick = () => {
   unpause()
 }
 
-addEventListener("pointerlockchange", () => {
+document.addEventListener("pointerlockchange", () => {
   if (document.pointerLockElement) {
     unpause()
   } else {
