@@ -98,7 +98,7 @@ function generateChunk(chunkX, chunkZ) {
           let slope = getSlope(worldX, worldZ) + noise / 4
           if (slope < 0.3) block = Block.GRASS
           else if (slope < 0.5) block = noise > 0.5 ? Block.GRAVEL : Block.DIRT
-          else if (slope < 0.6) block = Block.ROCKY_DIRT
+          else if (slope < 0.6) block = worldX * worldZ % 5 == 0 ? Block.ROCKY_DIRT : Block.DIRT
 
           if (y < 8 && slope < 0.01) block = Block.MUD
         }

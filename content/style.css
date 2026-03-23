@@ -13,7 +13,7 @@ button, ui-div {
 }
 
 button {
-  height: calc(var(--ui-px) * 6);
+  height: calc(var(--ui-px) * 7);
   width: round(30%, var(--ui-px));
   min-width: max-content;
   white-space: nowrap;

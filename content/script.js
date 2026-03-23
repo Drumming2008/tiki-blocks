@@ -10,6 +10,7 @@ let paused = true, waitingToLock = false
 function pause() {
   paused = true
   id("pause-menu").style.display = ""
+  id("hud").style.display = "none"
 }
 
 function unpause() {
@@ -20,6 +21,7 @@ function enterPointerLock() {
   canvas.requestPointerLock().then(() => {
     paused = false
     id("pause-menu").style.display = "none"
+    id("hud").style.display = ""
   })
   .catch(error => {
     console.error(error)
@@ -29,7 +31,7 @@ function enterPointerLock() {
 function togglePause() {
   enterPointerLock()
   if (paused) {
-    id("pause-menu").style.display = "none"
+    unpause()
   } else pause()
 }
 
