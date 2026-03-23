@@ -1,14 +1,14 @@
 const { app, BrowserWindow } = require("electron")
 
 function createWindow() {
+  app.commandLine.appendSwitch("disable-gesture-requirement-for-presentation", "true")
+
   const win = new BrowserWindow({
-    width: 800,
+    width: 900,
     height: 600
   })
 
   win.loadFile("content/index.html")
-
-  app.commandLine.appendSwitch("disable-gesture-requirement-for-presentation", "true")
 }
 
 app.whenReady().then(createWindow)

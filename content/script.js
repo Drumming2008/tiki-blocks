@@ -74,12 +74,7 @@ onkeyup = e => {
 }
 
 function processKeys() {
-  const MOVE_SPEED = 1, LOOK_SPEED = 0.03
-
-  if (keysDown.ArrowDown) camera.pitch += LOOK_SPEED
-  if (keysDown.ArrowUp) camera.pitch -= LOOK_SPEED
-  if (keysDown.ArrowRight) camera.yaw += LOOK_SPEED
-  if (keysDown.ArrowLeft) camera.yaw -= LOOK_SPEED
+  const MOVE_SPEED = 0.5
 
   camera.pitch = clamp(camera.pitch, -Math.PI / 2, Math.PI / 2)
   camera.yaw %= 2 * Math.PI
