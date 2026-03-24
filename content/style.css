@@ -19,6 +19,7 @@ button {
   white-space: nowrap;
   padding: 0 var(--ui-px);
   line-height: 0;
+  color: #121212;
 }
 
 button:is(:hover, :focus-visible) {
@@ -42,6 +43,7 @@ html, body {
 }
 
 * {
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
   border: none;
@@ -60,15 +62,16 @@ canvas {
 }
 
 #debug {
-  --shadow-size: 1px;
   display: none;
   position: absolute;
   inset: 8px 12px;
   pointer-events: none;
-  color: white;
-  text-shadow: 0 var(--shadow-size) black, var(--shadow-size) 0 black, 0 calc(var(--shadow-size) * -1) black, calc(var(--shadow-size) * -1) 0 black, var(--shadow-size) var(--shadow-size) black, var(--shadow-size) calc(var(--shadow-size) * -1) black, calc(var(--shadow-size) * -1) calc(var(--shadow-size) * -1) black, calc(var(--shadow-size) * -1) var(--shadow-size) black;
   font-size: 12px;
   line-height: 1.8;
+  color: white;
+  --shadow-size: 1px;
+  --shadow-color: #121212;
+  text-shadow: 0 var(--shadow-size) var(--shadow-color), var(--shadow-size) 0 var(--shadow-color), 0 calc(var(--shadow-size) * -1) var(--shadow-color), calc(var(--shadow-size) * -1) 0 var(--shadow-color), var(--shadow-size) var(--shadow-size) var(--shadow-color), var(--shadow-size) calc(var(--shadow-size) * -1) var(--shadow-color), calc(var(--shadow-size) * -1) calc(var(--shadow-size) * -1) var(--shadow-color), calc(var(--shadow-size) * -1) var(--shadow-size) var(--shadow-color);
 }
 
 #debug.show {
@@ -79,6 +82,14 @@ canvas {
   position: fixed;
   inset: 0;
   pointer-events: none;
+}
+
+#crosshair {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) scale(2.5);
+  mix-blend-mode: difference;
 }
 
 ui-div {
@@ -101,4 +112,84 @@ ui-div {
   gap: calc(var(--ui-px) * 2);
   justify-content: center;
   align-items: center;
+  background: rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(5px);
+}
+
+#settings {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  background-image: url("./assets/blocks/dirt.png");
+  background-size: calc(var(--ui-px) * 16);
+  background-position: center top;
+  display: flex;
+  gap: calc(var(--ui-px) * 6);
+  justify-content: center;
+  padding: calc(var(--ui-px) * 5) calc(var(--ui-px) * 10);
+}
+
+#settings.hidden {
+  display: none;
+}
+
+#settings > section {
+  flex-basis: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--ui-px) * 2);
+}
+
+#settings button, #settings ui-slider {
+  width: round(100%, var(--ui-px));
+}
+
+#settings > #left {
+  align-items: end;
+}
+
+#settings > #right {
+  align-items: start;
+  padding-top: calc(var(--ui-px) * 9);
+}
+
+ui-slider {
+  position: relative;
+  height: calc(var(--ui-px) * 15);
+  color: white;
+  padding: var(--ui-px);
+  background: #4f362c;
+}
+
+#slider-track {
+  width: calc(100% - var(--ui-px) * 5);
+  position: absolute;
+  left: calc(var(--ui-px) * 2.5); 
+  top: calc(50% + var(--ui-px) * 3);
+  transform: translateY(-50%);
+  height: var(--ui-px);
+  background: gray;
+  box-shadow: calc(var(--ui-px) * 1.5) 0 0 gray, calc(var(--ui-px) * -1.5) 0 0 gray;
+}
+
+#slider-thumb {
+  padding: 0;
+  width: calc(var(--ui-px) * 3);
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  left: 50%;
+  /* box-shadow: 0 var(--ui-px) 0 #4f362c; */
+}
+
+#slider-label {
+  position: absolute;
+  top: var(--ui-px);
+  left: var(--ui-px)0;
+}
+
+#slider-output {
+  position: absolute;
+  top: var(--ui-px);
+  right: var(--ui-px);
 }
