@@ -115,6 +115,11 @@ function setup() {
 
 const viewMat = mat4.create()
 
+function setProjectionMatrices(program) {
+  gl.uniformMatrix4fv(program.uniform.u_projectionMat, false, projectionMat)
+  gl.uniformMatrix4fv(program.uniform.u_viewMat, false, viewMat)
+}
+
 let lastFrameTimes = []
 
 function draw() {
@@ -144,18 +149,48 @@ function draw() {
 
   clearCanvas()
 
-  useProgram(programs.block)
-
-  useTexture(programs.block.uniform.u_tex, blockTexture, 0, gl.TEXTURE_2D_ARRAY)
-
   mat4.fromXRotation(viewMat, camera.pitch)
   mat4.rotateY(viewMat, viewMat, camera.yaw)
   mat4.translate(viewMat, viewMat, [-camera.x, -camera.y, -camera.z])
 
-  gl.uniformMatrix4fv(programs.block.uniform.u_projectionMat, false, projectionMat)
-  gl.uniformMatrix4fv(programs.block.uniform.u_viewMat, false, viewMat)
-
+  useProgram(programs.block)
+  useTexture(programs.block.uniform.u_tex, blockTexture, 0, gl.TEXTURE_2D_ARRAY)
+  setProjectionMatrices(programs.block)
   drawChunks()
+
+  if (showDebug) {
+    let [chunkX, chunkZ] = getChunkPos(camera.x, camera.z), points
+
+    useProgram(programs.project)
+    setProjectionMatrices(programs.project)
+    gl.bindBuffer(gl.ARRAY_BUFFER, programs.project.buffer.a_pos)
+
+    points = []
+    for (let y = 0; y <= CHUNK_HEIGHT; y += 4) {
+      let x = chunkX * CHUNK_SIZE, z = chunkZ * CHUNK_SIZE
+      let x2 = x + CHUNK_SIZE, z2 = z + CHUNK_SIZE
+      points.push(
+        x, y, z, x2, y, z,
+        x2, y, z, x2, y, z2,
+        x2, y, z2, x, y, z2,
+        x, y, z2, x, y, z
+      )
+    }
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(points), gl.DYNAMIC_DRAW)
+    gl.uniform4f(programs.project.uniform.u_color, 1, 1, 0, 1)
+    gl.drawArrays(gl.LINES, 0, points.length / 3)
+
+    points = []
+    for (let dx = -1; dx <= 2; dx++) {
+      for (let dz = -1; dz <= 2; dz++) {
+        let x = (chunkX + dx) * CHUNK_SIZE, z = (chunkZ + dz) * CHUNK_SIZE
+        points.push(x, 0, z, x, CHUNK_HEIGHT, z)
+      }
+    }
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(points), gl.DYNAMIC_DRAW)
+    gl.uniform4f(programs.project.uniform.u_color, 1, 0, 0, 1)
+    gl.drawArrays(gl.LINES, 0, points.length / 3)
+  }
 }
 
 function loaded() {

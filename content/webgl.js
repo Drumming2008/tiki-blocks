@@ -1,4 +1,4 @@
-const shaderNames = ["test", "block"]
+const shaderNames = ["project", "block"]
 
 const canvas = document.querySelector("canvas"), gl = canvas.getContext("webgl2")
 

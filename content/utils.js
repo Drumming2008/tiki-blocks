@@ -18,9 +18,3 @@ function clamp(x, min, max) {
 function id(id) {
   return document.getElementById(id)
 }
-
-function isSolid(x, y, z) {
-  let id = getBlockIdAt(x, y, z)
-  if (id == null) return
-  return !blocksById[id].transparent
-}

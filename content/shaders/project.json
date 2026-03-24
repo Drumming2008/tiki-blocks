@@ -1,0 +1,9 @@
+{
+  "attributes": {
+    "a_pos": {
+      "type": "FLOAT",
+      "size": 3
+    }
+  },
+  "uniforms": ["u_projectionMat", "u_viewMat", "u_color"]
+}
