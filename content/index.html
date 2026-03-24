@@ -11,6 +11,9 @@
     <canvas></canvas>
     <div id="debug"></div>
     <img id="crosshair" src="./assets/ui/crosshair.png" draggable="false">
+    <ui-div id="inventory" class="hidden">
+      <h1>Inventory</h1>
+    </ui-div>
     <div id="hud">
       <ui-div id="hotbar"></ui-div>
     </div>
@@ -19,22 +22,26 @@
         Back to Game
       </button>
       <button id="open-settings">
-        Settings
+        Settings…
       </button>
       <button>
         Save and Quit
       </button>
     </div>
-    <div id="settings" class="hidden">
+    <div id="settings" class="menu hidden">
       <section id="left">
-        <button id="close-settings">< Back</button>
+        <button id="close-settings">&lt; Back</button>
         <ui-slider min="30" value="80" max="200">FOV</ui-slider>
       </section>
       <section id="right">
-        <button>Whener</button>
-        <button>Tener</button>
-        <button>Hunt</button>
+        <button id="open-keybinds">Keybinds…</button>
+        <button>Choose Save Location</button>
+        <button></button>
+        <button></button>
       </section>
+    </div>
+    <div id="keybinds" class="menu hidden">
+      <button id="close-keybinds">&lt; Back</button>
     </div>
     <script src="./gl-matrix.js"></script>
     <script src="./utils.js"></script>

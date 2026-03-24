@@ -14,6 +14,14 @@ id("close-settings").onclick = () => {
   id("settings").classList.add("hidden")
 }
 
+id("open-keybinds").onclick = () => {
+  id("keybinds").classList.remove("hidden")
+}
+
+id("close-keybinds").onclick = () => {
+  id("keybinds").classList.add("hidden")
+}
+
 class UISlider extends HTMLElement {
   constructor() {
     super()

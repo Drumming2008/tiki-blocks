@@ -5,7 +5,6 @@
 button, ui-div {
   --border-size: var(--ui-px);
   border: var(--border-size) solid transparent;
-
   border-image-source: url("./assets/ui/gray.png");
   border-image-slice: 1 fill;
   border-image-width: var(--border-size);
@@ -15,7 +14,7 @@ button, ui-div {
 button {
   height: calc(var(--ui-px) * 7);
   width: round(30%, var(--ui-px));
-  min-width: max-content;
+  min-width: calc(var(--ui-px) * 16);
   white-space: nowrap;
   padding: 0 var(--ui-px);
   line-height: 0;
@@ -100,7 +99,7 @@ ui-div {
   bottom: var(--ui-px);
   left: 50%;
   transform: translateX(-50%);
-  height: calc(var(--ui-px) * 5);
+  height: calc(var(--ui-px) * 7);
   width: calc(var(--ui-px) * 50);
 }
 
@@ -116,7 +115,7 @@ ui-div {
   backdrop-filter: blur(5px);
 }
 
-#settings {
+.menu {
   position: fixed;
   inset: 0;
   z-index: 1;
@@ -129,7 +128,7 @@ ui-div {
   padding: calc(var(--ui-px) * 5) calc(var(--ui-px) * 10);
 }
 
-#settings.hidden {
+.menu.hidden {
   display: none;
 }
 
@@ -150,7 +149,6 @@ ui-div {
 
 #settings > #right {
   align-items: start;
-  padding-top: calc(var(--ui-px) * 9);
 }
 
 ui-slider {
@@ -176,6 +174,7 @@ ui-slider {
 #slider-thumb {
   padding: 0;
   width: calc(var(--ui-px) * 3);
+  min-width: 0;
   position: absolute;
   top: 50%;
   transform: translate(-50%, -50%);
@@ -193,4 +192,21 @@ ui-slider {
   position: absolute;
   top: var(--ui-px);
   right: var(--ui-px);
+}
+
+#keybinds button {
+  width: round(30%, calc(var(--ui-px) * 2));
+}
+
+#inventory {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  height: 75vh;
+  aspect-ratio: 1;
+}
+
+#inventory.hidden {
+  display: none;
 }
