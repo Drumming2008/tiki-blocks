@@ -47,6 +47,11 @@ const rawBlocks = {
     name: "Mud",
     texture: "mud"
   },
+  SAND: {
+    id: 9,
+    name: "Sand",
+    texture: "sand"
+  },
   CHEESE_BRICKS: {
     id: 254,
     name: "Cheese Bricks",

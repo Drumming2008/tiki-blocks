@@ -194,8 +194,45 @@ ui-slider {
   right: var(--ui-px);
 }
 
+#keybinds {
+  flex-direction: column;
+  gap: calc(var(--ui-px) * 2);
+  justify-content: start;
+  align-items: center;
+}
+
 #keybinds button {
   width: round(30%, calc(var(--ui-px) * 2));
+}
+
+#keybinds-scroller {
+  width: 100%;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--ui-px) * 2);
+}
+
+.keybind-wrapper {
+  padding: var(--ui-px);
+  padding-left: calc(var(--ui-px) * 2);
+  background: #4f362c;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: calc(var(--ui-px) * 7);
+  width: 100%;
+  color: white;
+}
+
+.keybind-wrapper > input {
+  background: transparent;
+  --width: 2em;
+  width: calc(var(--width) + (var(--ui-px) * 2));
+  text-align: right;
+  background: #563a2f;
+  padding: var(--ui-px);
 }
 
 #inventory {

@@ -58,6 +58,29 @@ onmousemove = e => {
   }
 }
 
+let keybinds = [
+  {
+    default: "w",
+    desc: "Walk Forward"
+  },
+  {
+    default: "s",
+    desc: "Walk Backward"
+  },
+  {
+    default: "a",
+    desc: "Walk Left"
+  },
+  {
+    default: "d",
+    desc: "Walk Right"
+  },
+  {
+    default: " ",
+    desc: "Jump"
+  }
+]
+
 let keysDown = {}
 onkeydown = e => {
   if (!e.metaKey) keysDown[e.code] = "press"

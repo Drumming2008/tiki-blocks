@@ -100,7 +100,8 @@ function generateChunk(chunkX, chunkZ) {
           else if (slope < 0.5) block = noise > 0.5 ? Block.GRAVEL : Block.DIRT
           else if (slope < 0.6) block = worldX * worldZ % 7 == 0 ? Block.ROCKY_DIRT : Block.DIRT
 
-          if (y < 8 && slope < 0.01) block = Block.MUD
+          if (y < 8 && slope < 0.01) block = Block.SAND
+          if (y < 3 && slope < 0.01) block = Block.MUD
         }
         blocks[layerIndex + y * CHUNK_LAYER_LEN] = block
       }

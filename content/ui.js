@@ -104,3 +104,41 @@ class UISlider extends HTMLElement {
 
 customElements.define("ui-slider", UISlider)
 
+function setInputWidth(input) {
+  let span = document.createElement("span")
+  span.innerText = input.value
+  span.style.pointerEvents = "none"
+  span.style.position = "absolute"
+  span.style.top = "200vh"
+  document.body.append(span)
+  let box = span.getBoundingClientRect()
+  input.style.setProperty("--width", box.width + "px")
+  // span.remove()
+}
+
+function setKeybindValue(input, value) {
+  input.value = value.toUpperCase().replace(" ", "SPACE").replace("ALT", "OPTION").replace("META", "COMMAND").replace("BACKSPACE", "DELETE")
+  setInputWidth(input)
+}
+
+function createKeybind(k) {
+  let wrapper = document.createElement("div")
+  wrapper.classList.add("keybind-wrapper")
+  id("keybinds-scroller").append(wrapper)
+
+  let desc = document.createElement("span")
+  desc.innerText = k.desc
+  wrapper.append(desc)
+
+  let input = document.createElement("input")
+  input.onkeydown = e => {
+    e.preventDefault()
+    setKeybindValue(input, e.key)
+  }
+  wrapper.append(input)
+  setKeybindValue(input, k.default)
+}
+
+for (let k of keybinds) {
+  createKeybind(k)
+}
