@@ -12,5 +12,5 @@
       "int": true
     }
   },
-  "uniforms": ["u_projectionMat", "u_viewMat", "u_offset", "u_tex"]
+  "uniforms": ["u_cameraPos", "u_offset", "u_renderDistance", "u_projectionMat", "u_viewMat", "u_tex"]
 }

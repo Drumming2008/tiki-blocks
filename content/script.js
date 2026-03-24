@@ -155,7 +155,11 @@ function draw() {
 
   useProgram(programs.block)
   useTexture(programs.block.uniform.u_tex, blockTexture, 0, gl.TEXTURE_2D_ARRAY)
+
   setProjectionMatrices(programs.block)
+  gl.uniform3f(programs.block.uniform.u_cameraPos, camera.x, camera.y, camera.z)
+  gl.uniform1f(programs.block.uniform.u_renderDistance, renderDistance * CHUNK_SIZE)
+
   drawChunks()
 
   if (showDebug) {

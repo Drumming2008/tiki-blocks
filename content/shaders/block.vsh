@@ -16,13 +16,20 @@ const float[] FACE_BRIGHTNESS = float[](
 in int a_data;
 in int a_corner;
 
+uniform vec3 u_cameraPos;
 uniform ivec2 u_offset;
+uniform float u_renderDistance;
 
 uniform mat4 u_viewMat;
 uniform mat4 u_projectionMat;
 
 out vec3 v_texPos;
 out float v_brightness;
+out float v_fog;
+
+float fogStrength(float dist) {
+    return smoothstep(0.9, 1.0, dist / u_renderDistance);
+}
 
 void main() {
     int data = a_data;
@@ -68,4 +75,5 @@ void main() {
 
     v_brightness = FACE_BRIGHTNESS[face];
     v_texPos = vec3((a_corner & 1) ^ (a_corner >> 1), 1 - (a_corner >> 1), tex);
+    v_fog = fogStrength(distance(vec3(pos), u_cameraPos));
 }

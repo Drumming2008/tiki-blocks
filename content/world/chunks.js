@@ -57,8 +57,10 @@ function loadChunksAround(centerX, centerZ, renderDist) {
 
   for (let x = chunkX - renderDist; x <= chunkX + renderDist; x++) {
     for (let z = chunkZ - renderDist; z <= chunkZ + renderDist; z++) {
-      // TODO maybe should be more generous to include chunks partially visible in render distance fog
-      let dist = Math.hypot(x - centerX, z - centerZ)
+      let dx = x - centerX, dz = z - centerZ
+      if (dx < 0) dx = Math.min(0, dx + 1)
+      if (dz < 0) dz = Math.min(0, dz + 1)
+      let dist = Math.hypot(dx, dz)
       if (dist <= renderDist) {
         toLoad.push({ dist, x, z })
       }
