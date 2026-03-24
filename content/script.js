@@ -109,7 +109,7 @@ function setup() {
   useProgram(programs.block)
 
   gl.bindBuffer(gl.ARRAY_BUFFER, programs.block.buffer.a_corner)
-  gl.bufferData(gl.ARRAY_BUFFER, new Int8Array([0, 1, 3, 2]), gl.STATIC_DRAW)
+  gl.bufferData(gl.ARRAY_BUFFER, new Int8Array([0, 1, 2, 3]), gl.STATIC_DRAW)
   gl.vertexAttribDivisor(programs.block.attrib.a_data, 1)
 }
 
