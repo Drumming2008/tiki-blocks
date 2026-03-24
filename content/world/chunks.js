@@ -28,6 +28,10 @@ function getChunkPos(x, z) {
   return [Math.floor(x / CHUNK_SIZE), Math.floor(z / CHUNK_SIZE)]
 }
 
+function sampleHeightmap(chunk, x, z) {
+  return chunk.heightmap[x + z * CHUNK_SIZE]
+}
+
 let workers = Array.from({ length: 4 }, () => {
   let { promise, resolve } = Promise.withResolvers()
 
@@ -104,10 +108,10 @@ async function loadChunk(x, z) {
 
     for (let z = 0; z < CHUNK_SIZE; z++) {
       let otherBlockDataXZ = z << 13
-      let blockDataXZ = blockDataX | z << 13
+      let blockDataXZ = blockDataX | otherBlockDataXZ
 
-      let ownH = chunk.heightmap[CHUNK_SIZE - 1 + z * CHUNK_SIZE]
-      let otherH = px.heightmap[z * CHUNK_SIZE]
+      let ownH = sampleHeightmap(chunk, CHUNK_SIZE - 1, z)
+      let otherH = sampleHeightmap(px, 0, z)
 
       for (let y = 0; y <= ownH; y++) {
         let data = blocksById[chunk.blocks[chunkBlockIndex(CHUNK_SIZE - 1, y, z)]]
@@ -130,6 +134,105 @@ async function loadChunk(x, z) {
 
     addFaces(px, null, null, null, otherFaces, null, null)
   }
+  if (nx) {
+    nxFaces = []
+    let otherFaces = []
+    let otherBlockDataX = CHUNK_SIZE - 1 << 8
+
+    for (let z = 0; z < CHUNK_SIZE; z++) {
+      let blockDataXZ = z << 13
+      let otherBlockDataXZ = otherBlockDataX | blockDataXZ
+
+      let ownH = sampleHeightmap(chunk, 0, z)
+      let otherH = sampleHeightmap(nx, CHUNK_SIZE - 1, z)
+
+      for (let y = 0; y <= ownH; y++) {
+        let data = blocksById[chunk.blocks[chunkBlockIndex(0, y, z)]]
+        if (data.invisible) continue
+        if (y <= otherH && !blocksById[nx.blocks[chunkBlockIndex(CHUNK_SIZE - 1, y, z)]].transparent) continue
+
+        let tex = blockTextureIndices[data.texture]
+        nxFaces.push(blockDataXZ | y | tex << 24 | 3 << 18)
+      }
+
+      for (let y = 0; y <= otherH; y++) {
+        let data = blocksById[nx.blocks[chunkBlockIndex(CHUNK_SIZE - 1, y, z)]]
+        if (data.invisible) continue
+        if (y <= ownH && !blocksById[chunk.blocks[chunkBlockIndex(0, y, z)]].transparent) continue
+
+        let tex = blockTextureIndices[data.texture]
+        otherFaces.push(otherBlockDataXZ | y | tex << 24 | 2 << 18)
+      }
+    }
+
+    addFaces(nx, null, null, otherFaces, null, null, null)
+  }
+  if (pz) {
+    pzFaces = []
+    let otherFaces = []
+    let blockDataZ = CHUNK_SIZE - 1 << 13
+
+    for (let x = 0; x < CHUNK_SIZE; x++) {
+      let otherBlockDataXZ = x << 8
+      let blockDataXZ = blockDataZ | otherBlockDataXZ
+
+      let ownH = sampleHeightmap(chunk, x, CHUNK_SIZE - 1)
+      let otherH = sampleHeightmap(pz, x, 0)
+
+      for (let y = 0; y <= ownH; y++) {
+        let data = blocksById[chunk.blocks[chunkBlockIndex(x, y, CHUNK_SIZE - 1)]]
+        if (data.invisible) continue
+        if (y <= otherH && !blocksById[pz.blocks[chunkBlockIndex(x, y, 0)]].transparent) continue
+
+        let tex = blockTextureIndices[data.texture]
+        pzFaces.push(blockDataXZ | y | tex << 24 | 4 << 18)
+      }
+
+      for (let y = 0; y <= otherH; y++) {
+        let data = blocksById[pz.blocks[chunkBlockIndex(x, y, 0)]]
+        if (data.invisible) continue
+        if (y <= ownH && !blocksById[chunk.blocks[chunkBlockIndex(x, y, CHUNK_SIZE - 1)]].transparent) continue
+
+        let tex = blockTextureIndices[data.texture]
+        otherFaces.push(otherBlockDataXZ | y | tex << 24 | 5 << 18)
+      }
+    }
+
+    addFaces(pz, null, null, null, null, null, otherFaces)
+  }
+  if (nz) {
+    nzFaces = []
+    let otherFaces = []
+    let otherBlockDataZ = CHUNK_SIZE - 1 << 13
+
+    for (let x = 0; x < CHUNK_SIZE; x++) {
+      let blockDataXZ = x << 8
+      let otherBlockDataXZ = otherBlockDataZ | blockDataXZ
+
+      let ownH = sampleHeightmap(chunk, x, 0)
+      let otherH = sampleHeightmap(nz, x, CHUNK_SIZE - 1)
+
+      for (let y = 0; y <= ownH; y++) {
+        let data = blocksById[chunk.blocks[chunkBlockIndex(x, y, 0)]]
+        if (data.invisible) continue
+        if (y <= otherH && !blocksById[nz.blocks[chunkBlockIndex(x, y, CHUNK_SIZE - 1)]].transparent) continue
+
+        let tex = blockTextureIndices[data.texture]
+        nzFaces.push(blockDataXZ | y | tex << 24 | 5 << 18)
+      }
+
+      for (let y = 0; y <= otherH; y++) {
+        let data = blocksById[nz.blocks[chunkBlockIndex(x, y, CHUNK_SIZE - 1)]]
+        if (data.invisible) continue
+        if (y <= ownH && !blocksById[chunk.blocks[chunkBlockIndex(x, y, 0)]].transparent) continue
+
+        let tex = blockTextureIndices[data.texture]
+        otherFaces.push(otherBlockDataXZ | y | tex << 24 | 4 << 18)
+      }
+    }
+
+    addFaces(nz, null, null, null, null, otherFaces, null)
+  }
 
   addFaces(chunk, null, null, pxFaces, nxFaces, pzFaces, nzFaces)
 }
@@ -142,7 +245,7 @@ function addFaces(chunk, py, ny, px, nx, pz, nz) {
 
   function add(x, y, z, lengths, buffer, data) {
     let lx = x ? x.length : 0, ly = y ? y.length : 0, lz = z ? z.length : 0
-    let added = lx + ly + lz
+    let lxy = lx + ly, added = lxy + lz
     if (!added) return data
 
     let oldXYLen = lengths.x + lengths.y, oldLen = oldXYLen + lengths.z
@@ -152,6 +255,7 @@ function addFaces(chunk, py, ny, px, nx, pz, nz) {
       data = new Int32Array(oldData.length - lengths.padding + added + FACE_BUFFER_PADDING)
       lengths.padding = FACE_BUFFER_PADDING
       if (ly) {
+        // newX oldX oldY newY oldZ newZ
         data.set(oldData.subarray(0, oldXYLen), lx)
         if (lx) {
           data.set(x, 0)
@@ -160,10 +264,11 @@ function addFaces(chunk, py, ny, px, nx, pz, nz) {
         data.set(y, oldXYLen + lx)
         lengths.y += ly
         if (lz) {
-          data.set(z, oldLen + lx + ly)
+          data.set(z, oldLen + lxy)
           lengths.z += lz
         }
       } else {
+        // newX oldX oldY oldZ newZ
         data.set(oldData, lx)
         if (lx) {
           data.set(x, 0)
@@ -178,9 +283,8 @@ function addFaces(chunk, py, ny, px, nx, pz, nz) {
       lengths.padding -= added
       // x12345 newX y2345 y1 newY z345 z12 newZ
       if (lz) {
-        data.set(z, oldLen + lx + ly)
+        data.set(z, oldLen + lxy)
       }
-      let lxy = lx + ly
       if (lxy) {
         let zLen = Math.min(lxy, lengths.z)
         data.copyWithin(oldLen + lxy - zLen, oldXYLen, oldXYLen + zLen)
