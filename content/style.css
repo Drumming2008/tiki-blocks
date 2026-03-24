@@ -162,14 +162,15 @@ ui-slider {
 }
 
 #slider-track {
+  --track-color: #7b818b;
   width: calc(100% - var(--ui-px) * 5);
   position: absolute;
   left: calc(var(--ui-px) * 2.5); 
   top: calc(50% + var(--ui-px) * 3);
   transform: translateY(-50%);
   height: var(--ui-px);
-  background: gray;
-  box-shadow: calc(var(--ui-px) * 1.5) 0 0 gray, calc(var(--ui-px) * -1.5) 0 0 gray;
+  background: var(--track-color);
+  box-shadow: calc(var(--ui-px) * 1.5) 0 0 var(--track-color), calc(var(--ui-px) * -1.5) 0 0 var(--track-color);
 }
 
 #slider-thumb {
