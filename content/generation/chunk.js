@@ -1,4 +1,4 @@
-importScripts("../world/block_data.js")
+importScripts("../world/block_data.js", "../generation/perlin.js")
 
 const paddingArray = Array(FACE_BUFFER_PADDING).fill(0)
 
@@ -92,16 +92,12 @@ function generateChunk(chunkX, chunkZ) {
       blocks[layerIndex] = Block.BEDROCK
 
       for (let y = 1; y <= height; y++) {
-        let block = Block.STONE
+        let block = Block.MUD
         if (y === height) {
-          let noise = Math.sin(worldX / 13) + Math.sin(worldZ / 13)
-          let slope = getSlope(worldX, worldZ) + noise / 4
-          if (slope < 0.3) block = Block.GRASS
-          else if (slope < 0.5) block = noise > 0.5 ? Block.GRAVEL : Block.DIRT
-          else if (slope < 0.6) block = worldX * worldZ % 7 == 0 ? Block.ROCKY_DIRT : Block.DIRT
-
-          if (y < 8 && slope < 0.01) block = Block.SAND
-          if (y < 3 && slope < 0.01) block = Block.MUD
+          if (Math.round(getHeight(worldX, worldZ)) > 36) block = Block.DIRT
+          if (Math.round(getHeight(worldX, worldZ) > 35 && Math.random() > 0.5)) block = Block.DIRT
+          if (Math.round(getHeight(worldX, worldZ)) > 40) block = Block.GRASS
+          if (Math.round(getHeight(worldX, worldZ) > 39 && Math.random() > 0.5)) block = Block.GRASS
         }
         blocks[layerIndex + y * CHUNK_LAYER_LEN] = block
       }
@@ -111,13 +107,13 @@ function generateChunk(chunkX, chunkZ) {
   return { blocks, heightmap }
 }
 
+let noise = createNoise(Math.random())
+let noise2 = createNoise(Math.random())
+
+let verticalScale = 50, horizontalScale = 129
+
 function getHeight(x, z) {
-  // temporary
-  return (Math.sin(x / 50) + Math.sin(z / 50)) * 15 + (Math.sin(x / 10) + Math.sin(z / 10)) * 4 + 20
-}
-// temporary
-function getSlope(x, z) {
-  return Math.hypot(0.3 * Math.cos(x / 50) + 0.4 * Math.cos(x / 10), 0.3 * Math.cos(z / 50) + 0.4 * Math.cos(z / 10))
+  return noise.perlin2(x / horizontalScale, z / horizontalScale) * verticalScale + verticalScale
 }
 
 function isTransparent(id) {

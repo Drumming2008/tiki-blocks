@@ -97,6 +97,7 @@ class UISlider extends HTMLElement {
   updateSlider(onlyNumber = false) {
     let value = this.getAttribute("value")
     this.output.innerText = value
+    uiSliderInput(this)
     if (onlyNumber) return
     this.thumb.style.left = `${this.getPercent(value, this.min, this.max)}%`
   }
@@ -141,4 +142,12 @@ function createKeybind(k) {
 
 for (let k of keybinds) {
   createKeybind(k)
+}
+
+function uiSliderInput(elem) {
+  console.log("sdl;kj")
+  if (elem == id("fov-slider")) {
+    FOV = glMatrix.toRadian(elem.getAttribute("value"))
+    resizeCanvas()
+  }
 }

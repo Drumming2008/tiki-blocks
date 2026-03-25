@@ -4,7 +4,8 @@ const canvas = document.querySelector("canvas"), gl = canvas.getContext("webgl2"
 
 // SIZING
 
-const NEAR = 0.1, FAR = null, FOV = glMatrix.toRadian(70)
+const NEAR = 0.1, FAR = null
+let FOV = glMatrix.toRadian(80)
 const projectionMat = mat4.create()
 
 let width, height
