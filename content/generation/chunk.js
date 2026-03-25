@@ -92,8 +92,9 @@ function generateChunk(chunkX, chunkZ) {
       blocks[layerIndex] = Block.BEDROCK
 
       for (let y = 1; y <= height; y++) {
-        let block = Block.MUD
+        let block = Block.DIRT
         if (y === height) {
+          block = Block.MUD
           if (Math.round(getHeight(worldX, worldZ)) > 36) block = Block.DIRT
           if (Math.round(getHeight(worldX, worldZ) > 35 && Math.random() > 0.5)) block = Block.DIRT
           if (Math.round(getHeight(worldX, worldZ)) > 40) block = Block.GRASS
@@ -107,13 +108,26 @@ function generateChunk(chunkX, chunkZ) {
   return { blocks, heightmap }
 }
 
-let noise = createNoise(Math.random())
-let noise2 = createNoise(Math.random())
+const seed = Math.round(Math.random() * 65536)
+console.log("seed", seed)
 
-let verticalScale = 50, horizontalScale = 129
+let noise = createNoise(seed)
+let noise2 = createNoise(seed)
+
+let verticalScale = 50, horizontalScale = 50
+
+function getNoise(noise, x, z) {
+  let val = 0
+  let i
+  for (i = 0; i < noise.length; i++) {
+    val += noise[i].perlin2(x / horizontalScale, z / horizontalScale)
+  }
+  return ((val * (verticalScale)) / i) + (verticalScale)
+  
+}
 
 function getHeight(x, z) {
-  return noise.perlin2(x / horizontalScale, z / horizontalScale) * verticalScale + verticalScale
+  return getNoise([noise, noise2], x, z)
 }
 
 function isTransparent(id) {
