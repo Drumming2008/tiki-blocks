@@ -108,11 +108,8 @@ function generateChunk(chunkX, chunkZ) {
   return { blocks, heightmap }
 }
 
-const seed = Math.round(Math.random() * 65536)
-console.log("seed", seed)
-
-let noise = createNoise(seed)
-let noise2 = createNoise(seed)
+// put noises here, but initialize them in ./generation/main.js
+let noise, noise2
 
 let verticalScale = 50, horizontalScale = 50
 

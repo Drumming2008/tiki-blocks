@@ -6,6 +6,9 @@ onmessage = ({ data: { id, type, data } }) => {
   if (type === "setup") {
     blockTextureIndices = data.blockTextureIndices
     postMessage(null)
+  } else if (type == "seed") {
+    noise = createNoise(data.seed)
+    noise2 = createNoise(data.seed)
   } else if (type === "generate") {
     let chunk = generateChunk(data.x, data.z)
     chunk.faces = computeFaces(chunk)

@@ -1,5 +1,8 @@
 let chunks = new Map(), loadedChunks = new Set()
 
+const seed = Math.round(Math.random() * 65536)
+console.log("SEED:", seed)
+
 function getBlockIdAt(x, y, z) {
   if (y < 0 || y >= CHUNK_HEIGHT) return null
 
@@ -39,6 +42,8 @@ let workers = Array.from({ length: 4 }, () => {
   let workerData = { worker, tasks: 0, loadingPromise: promise }
 
   worker.postMessage({ type: "setup", data: { blockTextureIndices } })
+  worker.postMessage({ type: "seed", data: { seed } })
+  
   worker.onmessage = () => {
     resolve()
     workerData.loadingPromise = null
