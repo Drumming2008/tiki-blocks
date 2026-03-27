@@ -3,7 +3,7 @@ const { mat4, glMatrix } = window.glMatrix
 const debugElem = document.getElementById("debug")
 let showDebug = false
 
-let camera = { x: -4, y: 40, z: 27, yaw: glMatrix.toRadian(325), pitch: glMatrix.toRadian(25) }
+let camera = { x: -4, y: 100, z: 27, yaw: glMatrix.toRadian(325), pitch: glMatrix.toRadian(25) }
 
 let paused = true, waitingToLock = false
 
