@@ -12,6 +12,7 @@ onmessage = ({ data: { id, type, data } }) => {
     noise3 = createNoise(data.seed + 2)
     humidityNoise = createNoise(data.seed + 4)
     temperatureNoise = createNoise(data.seed + 3)
+    temperatureNoise2 = createNoise(data.seed + 55)
   } else if (type === "generate") {
     let chunk = generateChunk(data.x, data.z)
     chunk.faces = computeFaces(chunk)

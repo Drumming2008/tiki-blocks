@@ -107,9 +107,7 @@ function generateChunk(chunkX, chunkZ) {
           // let humidity = humidityNoise.perlin2(worldX / humidityScale, worldZ / humidityScale)
           // let blockList = ["BEDROCK", "MUD", "DIRT", "STONE_BRICKS", "STONE", "GRAVEL", "GRASS", "CHEESE_BRICKS", "SAND"]
           // block = Block[blockList[Math.round((humidity + 1) / 2 * blockList.length)]]
-          
-          let biomeBlocks = ["BEDROCK", "MUD", "STONE_BRICKS", "STONE", "GRAVEL", "GRASS", "SAND"]
-          let closestTemp = findClosest(biomeCategories, temperatureNoise.perlin2(worldX / temperatureScale, worldZ / temperatureScale))
+          let closestTemp = findClosest(biomeCategories, (temperatureNoise.perlin2(worldX / temperatureScale, worldZ / temperatureScale) + temperatureNoise2.perlin2(worldX / temperatureScale, worldZ / temperatureScale)) / 2)
           let closestHumidity = findClosest(biomeCategories, humidityNoise.perlin2(worldX / humidityScale, worldZ / humidityScale))
           let biome = [biomeCategories.indexOf(closestTemp), biomeCategories.indexOf(closestHumidity)]
           // block = Block[biomeBlocks[biomeScale.indexOf()]]
@@ -135,9 +133,9 @@ function findClosest(list, goal) {
 }
 
 // put noises here, but initialize them in ./generation/main.js
-let noise, noise2, noise3, temperatureNoise, humidityNoise
+let noise, noise2, noise3, temperatureNoise, temperatureNoise2, humidityNoise
 
-let verticalScale = 50, horizontalScale = 50, temperatureScale = 200, humidityScale = 40, biomeScale = 100
+let verticalScale = 50, horizontalScale = 50, temperatureScale = 1000, humidityScale = 1000
 
 function getNoise(noise, x, z) {
   let val = 0

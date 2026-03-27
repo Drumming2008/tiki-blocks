@@ -11,17 +11,22 @@ humidity ->   temperature |
 
 const biome_index = {
   // first number = temp, second = humidity
-  "40": "plains",
+  "30": "plains",
+  "32": "desert",
+  "34": "stone",
   "41": "plains",
-  "42": "plains",
-  "43": "plains",
-  "44": "plains",
-  "45": "plains",
-  "46": "plains"
+  "43": "desert",
+  "45": "stone"
 }
 
 const biome_data = {
   "plains": {
     surface: "GRASS"
+  },
+  "desert": {
+    surface: "SAND"
+  },
+  "stone": {
+    surface: "STONE"
   }
 }
