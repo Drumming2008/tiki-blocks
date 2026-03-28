@@ -1,6 +1,6 @@
 let chunks = new Map(), loadedChunks = new Set()
 
-const seed = Math.round(Math.random() * 65536)
+const seed = (Math.random() * 0xffffffff) ^ Date.now()
 console.log("SEED:", seed)
 
 function getBlockIdAt(x, y, z) {
@@ -41,9 +41,8 @@ let workers = Array.from({ length: 4 }, () => {
   let worker = new Worker("./generation/main.js")
   let workerData = { worker, tasks: 0, loadingPromise: promise }
 
-  worker.postMessage({ type: "setup", data: { blockTextureIndices } })
-  worker.postMessage({ type: "seed", data: { seed } })
-  
+  worker.postMessage({ type: "setup", data: { blockTextureIndices, seed } })
+
   worker.onmessage = () => {
     resolve()
     workerData.loadingPromise = null

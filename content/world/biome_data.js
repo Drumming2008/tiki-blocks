@@ -1,32 +1,35 @@
-/*
-humidity ->   temperature |
-0 1 2 3 4 5 6             V
-1
-2
-3
-4
-5
-6
-*/
+const temperatureRanges = [-1, -0.5, 0, 0.5]
+const humidityRanges = [-1, -0.5, 0, 0.5]
 
-const biome_index = {
-  // first number = temp, second = humidity
-  "30": "plains",
-  "32": "desert",
-  "34": "stone",
-  "41": "plains",
-  "43": "desert",
-  "45": "stone"
+const biomeTable = [
+  //   0   <----- humidity ----->   3       temp v
+  ["cheese", "cheese", "stone",  "stone" ], // 0
+  ["cheese", "stone",  "stone",  "plains"],
+  ["plains", "plains", "plains", "desert"],
+  ["desert", "desert", "desert", "desert"]  // 3
+]
+
+function biomeTableLookup(temp, humidity) {
+  temp = clamp(temp, -1, 1)
+  humidity = clamp(humidity, -1, 1)
+
+  let tempIndex = temperatureRanges.findLastIndex(min => min <= temp)
+  let humidityIndex = humidityRanges.findLastIndex(min => min <= humidity)
+
+  return biomes[biomeTable[tempIndex][humidityIndex]]
 }
 
-const biome_data = {
-  "plains": {
-    surface: "GRASS"
+const biomes = {
+  plains: {
+    surface: Block.GRASS
   },
-  "desert": {
-    surface: "SAND"
+  desert: {
+    surface: Block.SAND
   },
-  "stone": {
-    surface: "STONE"
+  stone: {
+    surface: Block.STONE
+  },
+  cheese: {
+    surface: Block.CHEESE
   }
 }

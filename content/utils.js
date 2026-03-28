@@ -18,3 +18,23 @@ function clamp(x, min, max) {
 function id(id) {
   return document.getElementById(id)
 }
+
+function hashString(str) {
+  let hash = 0
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash << 5) - hash + str.charCodeAt(i)
+  }
+  return hash | 0
+}
+
+function seededRandom(s) {
+  return () => {
+    s |= 0
+    s = s + 0x9e3779b9 | 0
+    let t = s ^ s >>> 16
+    t = Math.imul(t, 0x21f0aaad)
+    t = t ^ t >>> 15
+    t = Math.imul(t, 0x735a2d97)
+    return ((t ^ t >>> 15) >>> 0) / 4294967296
+  }
+}
