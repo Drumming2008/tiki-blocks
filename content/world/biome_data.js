@@ -3,8 +3,8 @@ const humidityCutoffs = [-0.4, 0, 0.4]
 
 const biomeTable = [
   //   0   <----- humidity ----->   3       temp v
-  ["cheese", "cheese", "stone",  "stone" ], // 0
-  ["cheese", "stone",  "stone",  "plains"],
+  ["cheese", "cheese", "cheese",  "stone" ], // 0
+  ["cheese", "stone",  "plains",  "plains"],
   ["plains", "plains", "plains", "desert"],
   ["desert", "desert", "desert", "desert"]  // 3
 ]
@@ -18,6 +18,14 @@ function biomeTableLookup(temp, humidity) {
 
 const biomes = {
   // TODO need a better name than 'dirt'
+  ocean: {
+    surface: Block.GRASS, // surface block is only used above water level
+    dirt: Block.GRAVEL
+  },
+  beach: {
+    surface: Block.SAND,
+    dirt: Block.SAND
+  },
   plains: {
     surface: Block.GRASS,
     dirt: Block.DIRT

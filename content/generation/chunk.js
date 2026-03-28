@@ -69,8 +69,21 @@ function generateChunk(chunkX, chunkZ) {
       let worldZ = z + chunkZ * CHUNK_SIZE
       let layerIndex = x + z * CHUNK_SIZE
 
-      let biome = sampleBiome(worldX, worldZ)
-      let approxHeight = sampleApproxTerrainHeight(worldX, worldZ)
+      let [approxHeight, hillDampening] = sampleLandHeight(worldX, worldZ)
+      let seaLevelDist = approxHeight - seaLevel, biome
+      if (seaLevelDist < -4) {
+        biome = biomes.ocean
+      } else if (seaLevelDist < 2 && seaLevelDist < sampleBeachiness(worldX, worldZ)) {
+        biome = biomes.beach
+      } else {
+        biome = sampleBiome(worldX, worldZ)
+      }
+
+      let hilliness = sampleHilliness(worldX, worldZ) * hillDampening
+      approxHeight += sampleHillHeight(worldX, worldZ) * hilliness
+
+      let land3DAmount = sampleLand3DAmount(worldX, worldZ) * hillDampening
+
       let maxY = 1, wasSolid = true
       blocks[layerIndex] = Block.BEDROCK
 
@@ -83,7 +96,7 @@ function generateChunk(chunkX, chunkZ) {
         } else {
           let lastY = y - 1
           if (maxY === lastY) {
-            blocks[layerIndex + lastY * CHUNK_LAYER_LEN] = biome.surface
+            blocks[layerIndex + lastY * CHUNK_LAYER_LEN] = lastY >= seaLevel ? biome.surface : biome.dirt
             for (let dy = 1; dy <= dirtLayerThickness; dy++) {
               let i = layerIndex + (lastY - dy) * CHUNK_LAYER_LEN
               if (!blocks[i]) break

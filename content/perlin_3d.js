@@ -30,7 +30,7 @@ class Perlin3D {
   }
 
   mix(a, b, t) {
-    return (1.0 - t) * a + t * b
+    return a + (b - a) * t
   }
 
   fade(t) {

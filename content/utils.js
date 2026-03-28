@@ -19,6 +19,10 @@ function id(id) {
   return document.getElementById(id)
 }
 
+function smoothstep(x) {
+  return x * x * (3 - 2 * x)
+}
+
 function hashString(str) {
   let hash = 0
   for (let i = 0; i < str.length; i++) {
