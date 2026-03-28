@@ -96,11 +96,11 @@ function generateChunk(chunkX, chunkZ) {
         } else {
           let lastY = y - 1
           if (maxY === lastY) {
-            blocks[layerIndex + lastY * CHUNK_LAYER_LEN] = lastY >= seaLevel ? biome.surface : biome.dirt
+            blocks[layerIndex + lastY * CHUNK_LAYER_LEN] = lastY >= seaLevel ? biome.surface : biome.soil
             for (let dy = 1; dy <= dirtLayerThickness; dy++) {
               let i = layerIndex + (lastY - dy) * CHUNK_LAYER_LEN
               if (!blocks[i]) break
-              blocks[i] = biome.dirt
+              blocks[i] = biome.soil
             }
           }
 

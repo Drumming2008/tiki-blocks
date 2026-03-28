@@ -17,29 +17,28 @@ function biomeTableLookup(temp, humidity) {
 }
 
 const biomes = {
-  // TODO need a better name than 'dirt'
   ocean: {
     surface: Block.GRASS, // surface block is only used above water level
-    dirt: Block.GRAVEL
+    soil: Block.GRAVEL
   },
   beach: {
     surface: Block.SAND,
-    dirt: Block.SAND
+    soil: Block.SAND
   },
   plains: {
     surface: Block.GRASS,
-    dirt: Block.DIRT
+    soil: Block.DIRT
   },
   desert: {
     surface: Block.SAND,
-    dirt: Block.SAND
+    soil: Block.SAND
   },
   stone: {
     surface: Block.STONE,
-    dirt: Block.STONE
+    soil: Block.STONE
   },
   cheese: {
     surface: Block.CHEESE,
-    dirt: Block.CHEESE_BRICKS
+    soil: Block.CHEESE_BRICKS
   }
 }
