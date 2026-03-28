@@ -134,6 +134,9 @@ function setup() {
   gl.bindBuffer(gl.ARRAY_BUFFER, programs.block.buffer.a_corner)
   gl.bufferData(gl.ARRAY_BUFFER, new Int8Array([0, 1, 2, 3]), gl.STATIC_DRAW)
   gl.vertexAttribDivisor(programs.block.attrib.a_data, 1)
+
+  gl.bindTexture(gl.TEXTURE_2D_ARRAY, blockTexture)
+  gl.generateMipmap(gl.TEXTURE_2D_ARRAY)
 }
 
 const viewMat = mat4.create()

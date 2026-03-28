@@ -154,7 +154,7 @@ function loadTexturesFromObj(obj, path = "") {
 const textures = loadTexturesFromObj(imagePaths)
 */
 
-function createTexture(width, height, depth = null, data = null) {
+function createTexture(width, height, depth = null, data = null, mipmap = false) {
   let array = depth !== null
   let type = array ? gl.TEXTURE_2D_ARRAY : gl.TEXTURE_2D
 
@@ -165,7 +165,7 @@ function createTexture(width, height, depth = null, data = null) {
 
   gl.texParameteri(type, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
   gl.texParameteri(type, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
-  gl.texParameteri(type, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
+  gl.texParameteri(type, gl.TEXTURE_MIN_FILTER, mipmap ? gl.NEAREST_MIPMAP_LINEAR : gl.NEAREST)
   gl.texParameteri(type, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
 
   if (array) {

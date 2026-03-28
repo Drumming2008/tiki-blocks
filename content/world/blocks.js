@@ -15,4 +15,4 @@ for (let i = 0; i < blockTextures.length; i++) {
   }))
 }
 
-let blockTexture = createTexture(BLOCK_TEXTURE_SIZE, BLOCK_TEXTURE_SIZE, blockTextures.length)
+let blockTexture = createTexture(BLOCK_TEXTURE_SIZE, BLOCK_TEXTURE_SIZE, blockTextures.length, null, true)
