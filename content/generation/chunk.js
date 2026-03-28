@@ -69,19 +69,33 @@ function generateChunk(chunkX, chunkZ) {
       let worldZ = z + chunkZ * CHUNK_SIZE
       let layerIndex = x + z * CHUNK_SIZE
 
-      let height = Math.max(0, Math.round(sampleApproxTerrainHeight(worldX, worldZ)))
-      heightmap[layerIndex] = height
-
+      let biome = sampleBiome(worldX, worldZ)
+      let approxHeight = sampleApproxTerrainHeight(worldX, worldZ)
+      let maxY = 1, wasSolid = true
       blocks[layerIndex] = Block.BEDROCK
 
-      for (let y = 1; y <= height; y++) {
-        let block = Block.DIRT
-        if (y === height) {
-          let biome = sampleBiome(worldX, worldZ)
-          block = biome.surface
+      for (let y = 1; y <= CHUNK_HEIGHT; y++) {
+        let density = (approxHeight - y) / land3DAmount
+
+        if (density > -1 && (density >= 1 || sampleRawTerrainDensity(worldX, y, worldZ) < density)) {
+          blocks[layerIndex + y * CHUNK_LAYER_LEN] = Block.STONE
+          maxY = y
+        } else {
+          let lastY = y - 1
+          if (maxY === lastY) {
+            blocks[layerIndex + lastY * CHUNK_LAYER_LEN] = biome.surface
+            for (let dy = 1; dy <= dirtLayerThickness; dy++) {
+              let i = layerIndex + (lastY - dy) * CHUNK_LAYER_LEN
+              if (!blocks[i]) break
+              blocks[i] = biome.dirt
+            }
+          }
+
+          if (density <= -1) break
         }
-        blocks[layerIndex + y * CHUNK_LAYER_LEN] = block
       }
+
+      heightmap[layerIndex] = maxY
     }
   }
 

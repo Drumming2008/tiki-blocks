@@ -1,6 +1,6 @@
 let chunks = new Map(), loadedChunks = new Set()
 
-const seed = (Math.random() * 0xffffffff) ^ Date.now()
+const seed = (Math.random() * 0x100000000) ^ Date.now()
 console.log("SEED:", seed)
 
 function getBlockIdAt(x, y, z) {

@@ -27,7 +27,9 @@ function hashString(str) {
   return hash | 0
 }
 
-function seededRandom(s) {
+function seededRandom(s, int = false) {
+  let div = int ? 1 : 0x100000000
+
   return () => {
     s |= 0
     s = s + 0x9e3779b9 | 0
@@ -35,6 +37,6 @@ function seededRandom(s) {
     t = Math.imul(t, 0x21f0aaad)
     t = t ^ t >>> 15
     t = Math.imul(t, 0x735a2d97)
-    return ((t ^ t >>> 15) >>> 0) / 4294967296
+    return ((t ^ t >>> 15) >>> 0) / div
   }
 }

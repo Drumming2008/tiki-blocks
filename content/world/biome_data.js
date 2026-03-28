@@ -1,5 +1,5 @@
-const temperatureRanges = [-1, -0.5, 0, 0.5]
-const humidityRanges = [-1, -0.5, 0, 0.5]
+const temperatureCutoffs = [-0.4, 0, 0.4]
+const humidityCutoffs = [-0.4, 0, 0.4]
 
 const biomeTable = [
   //   0   <----- humidity ----->   3       temp v
@@ -10,26 +10,28 @@ const biomeTable = [
 ]
 
 function biomeTableLookup(temp, humidity) {
-  temp = clamp(temp, -1, 1)
-  humidity = clamp(humidity, -1, 1)
-
-  let tempIndex = temperatureRanges.findLastIndex(min => min <= temp)
-  let humidityIndex = humidityRanges.findLastIndex(min => min <= humidity)
+  let tempIndex = temperatureCutoffs.findLastIndex(min => min <= temp) + 1
+  let humidityIndex = humidityCutoffs.findLastIndex(min => min <= humidity) + 1
 
   return biomes[biomeTable[tempIndex][humidityIndex]]
 }
 
 const biomes = {
+  // TODO need a better name than 'dirt'
   plains: {
-    surface: Block.GRASS
+    surface: Block.GRASS,
+    dirt: Block.DIRT
   },
   desert: {
-    surface: Block.SAND
+    surface: Block.SAND,
+    dirt: Block.SAND
   },
   stone: {
-    surface: Block.STONE
+    surface: Block.STONE,
+    dirt: Block.STONE
   },
   cheese: {
-    surface: Block.CHEESE
+    surface: Block.CHEESE,
+    dirt: Block.CHEESE_BRICKS
   }
 }
