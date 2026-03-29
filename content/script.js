@@ -164,7 +164,7 @@ function draw() {
 
   if (showDebug) {
     let camX = Math.floor(camera.x), camY = Math.floor(camera.y), camZ = Math.floor(camera.z)
-    let blockId = getBlockIdAt(camX, camY, camZ)
+    let blockId = getBlockId(camX, camY, camZ)
     let chunk = getChunk(...getChunkPos(camX, camZ))
 
     debugElem.innerText = [

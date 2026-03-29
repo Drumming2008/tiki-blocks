@@ -54,20 +54,6 @@ class Chunk {
   }
 }
 
-function getBlockIdAt(x, y, z) {
-  if (y < 0 || y >= CHUNK_HEIGHT) return null
-
-  let chunk = getChunk(...getChunkPos(x, z))
-  if (!chunk) return null
-
-  return chunk.getBlockWorld(x, y, z)
-}
-
-function wrapPosToChunkSize(x, y, z) {
-  let [chunkX, chunkZ] = getChunkPos(x, z)
-  return [x - chunkX * CHUNK_SIZE, y, z - chunkZ * CHUNK_SIZE]
-}
-
 function getChunk(x, z, includeLoading = false) {
   let chunk = chunks.get(chunkKey(x, z))
   if (chunk?.loading && !includeLoading) return null
