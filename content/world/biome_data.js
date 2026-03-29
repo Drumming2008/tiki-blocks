@@ -3,7 +3,7 @@ const humidityCutoffs = [-0.4, 0, 0.4]
 
 const biomeTable = [
   //   0   <----- humidity ----->   3       temp v
-  ["cheese", "cheese", "cheese", "stone" ], // 0
+  ["mud",    "cheese", "cheese", "stone" ], // 0
   ["cheese", "stone",  "plains", "plains"],
   ["plains", "plains", "plains", "desert"],
   ["desert", "desert", "desert", "desert"]  // 3
@@ -40,5 +40,9 @@ const biomes = {
   cheese: {
     surface: Block.CHEESE,
     soil: Block.CHEESE_BRICKS
+  },
+  mud: {
+    surface: Block.MUD,
+    soil: Block.MUD
   }
 }
