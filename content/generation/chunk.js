@@ -1,5 +1,7 @@
 importScripts("../world/block_data.js", "../world/biome_data.js")
 
+const DO_CAVES = false
+
 const paddingArray = Array(FACE_BUFFER_PADDING).fill(0)
 
 function computeFaces({ blocks, heightmap }) {
@@ -90,6 +92,8 @@ function generateChunk(chunkX, chunkZ) {
       blocks[layerIndex] = Block.BEDROCK
 
       for (let y = 1; y <= CHUNK_HEIGHT; y++) {
+        if (DO_CAVES && isNoodleCave(0.04, worldX, y, worldZ)) continue
+
         let density = (approxHeight - y) / land3DAmount
 
         if (density > -1 && (density >= 1 || sampleRawTerrainDensity(worldX, y, worldZ) < density)) {

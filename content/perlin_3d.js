@@ -91,8 +91,8 @@ class OctavePerlin3D {
   }
 
   sample(x, y, z) {
-    return this.octaves.reduce((sum, { scale, magnitude, offset, perlin }) => {
-      return sum + perlin.sample((x + offset[0]) / scale, (y + offset[1]) / scale, (z + offset[2]) / scale) * magnitude
+    return this.octaves.reduce((sum, { scale, yScale = 1, magnitude, offset, perlin }) => {
+      return sum + perlin.sample((x + offset[0]) / scale, (y + offset[1]) / (scale * yScale), (z + offset[2]) / scale) * magnitude
     }, 0)
   }
 }

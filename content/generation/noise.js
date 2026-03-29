@@ -48,6 +48,18 @@ function initNoise(seed) {
       { scale: s * 700, magnitude: 0.5 },
       { scale: 32, magnitude: 0.02 },
       { scale: 6, magnitude: 0.005 }
+    ]),
+    noodleCaviness: new OctavePerlin3D(random(), [
+      { scale: 400, yScale: 0.5, magnitude: 1 },
+      { scale: 150, yScale: 0.5, magnitude: 0.4 }
+    ]),
+    noodleCaveA: new OctavePerlin3D(random(), [
+      { scale: 90, yScale: 0.7, magnitude: 1 },
+      { scale: 40, yScale: 0.7, magnitude: 0.3 }
+    ]),
+    noodleCaveB: new OctavePerlin3D(random(), [
+      { scale: 150, yScale: 0.7, magnitude: 1 },
+      { scale: 60, yScale: 0.7, magnitude: 0.3 }
     ])
   }
 }
@@ -73,20 +85,19 @@ class Spline {
 
 const splines = {
   land: new Spline([
-    { x: -1, y: 8 },
-    { x: -0.44, y: 12 },
-    { x: -0.4, y: 30 },
-    { x: -0.13, y: 33 },
-    { x: -0.1, y: seaLevel + 1 },
-    { x: 0.08, y: 72 },
-    { x: 0.25, y: 68, },
-    { x: 0.4, y: 84 },
+    { x: -1, y: 10 },
+    { x: -0.42, y: 12 },
+    { x: -0.38, y: 30 },
+    { x: -0.1, y: 33 },
+    { x: -0.03, y: 40 },
+    { x: 0, y: seaLevel + 1 },
+    { x: 0.15, y: 72 },
+    { x: 0.3, y: 68, },
+    { x: 0.5, y: 84 },
     { x: 0.8, y: 120 },
     { x: 1, y: 70 }
   ])
 }
-
-const seaLevelHillDampeningDist = 0.03
 
 function sampleLandHeight(x, z) {
   let raw = noise.land.sample(x, z)
@@ -116,11 +127,17 @@ function sampleRawTerrainDensity(x, y, z) {
 }
 
 function sampleLand3DAmount(x, z) {
-  let raw = noise.land3DAmount.sample(x, z) / 2 + 0.5
-  return 20 * raw ** 10 + 5 * raw
+  let raw = Math.max(0, noise.land3DAmount.sample(x, z) + 0.3)
+  return 5 * raw
+  // return 20 * raw ** 10 + 5 * raw
 }
 
 function sampleBiome(x, z) {
   let temp = noise.temperature.sample(x, z), humidity = noise.humidity.sample(x, z)
   return biomeTableLookup(temp, humidity)
+}
+
+function isNoodleCave(caviness, x, y, z)  {
+  return Math.abs(noise.noodleCaveA.sample(x, y, z)) < caviness
+      && Math.abs(noise.noodleCaveB.sample(x, y, z)) < caviness
 }
