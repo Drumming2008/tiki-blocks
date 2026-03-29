@@ -11,38 +11,29 @@ function pause() {
   paused = true
   id("pause-menu").style.display = ""
   id("hud").style.display = "none"
+  document.exitPointerLock()
 }
+
 
 function unpause() {
-  enterPointerLock()
-}
-
-function enterPointerLock() {
-  canvas.requestPointerLock().then(() => {
-    paused = false
-    id("pause-menu").style.display = "none"
-    id("hud").style.display = ""
-  })
-  .catch(error => {
-    console.error(error)
-  })
+  canvas.requestPointerLock()
+    .then(() => {
+      paused = false
+      id("pause-menu").style.display = "none"
+      id("hud").style.display = ""
+    })
+    .catch(console.error)
 }
 
 function togglePause() {
-  enterPointerLock()
-  if (paused) {
-    unpause()
-  } else pause()
+  if (paused) unpause()
+  else pause()
 }
 
-id("resume").onclick = () => {
-  unpause()
-}
+id("resume").onclick = unpause
 
 document.addEventListener("pointerlockchange", () => {
-  if (document.pointerLockElement) {
-    unpause()
-  } else {
+  if (!document.pointerLockElement && !paused) {
     pause()
   }
 })
@@ -83,11 +74,12 @@ let keybinds = [
 
 let keysDown = {}
 onkeydown = e => {
-  if (!e.metaKey) keysDown[e.code] = "press"
+  if (e.metaKey || e.repeat) return
 
-  if (e.code == "Escape") {
+  keysDown[e.code] = "press"
+
+  if (e.code === "Escape") {
     e.preventDefault()
-    console.log("SDLKJFHLKSJDHFLKJSDH")
     togglePause()
   }
 }
@@ -152,24 +144,6 @@ function draw() {
   let now = performance.now()
   while (now - lastFrameTimes[0] >= 1000) lastFrameTimes.shift()
   lastFrameTimes.push(now)
-
-  if (showDebug) {
-    let camX = Math.floor(camera.x), camY = Math.floor(camera.y), camZ = Math.floor(camera.z)
-    let blockId = getBlockIdAt(camX, camY, camZ)
-
-    debugElem.innerText = [
-      `${lastFrameTimes.length} FPS`,
-      "",
-      `Pos: ${camera.x.toFixed(2)}, ${camera.y.toFixed(4)}, ${camera.z.toFixed(2)} (Block: ${camX}, ${camY}, ${camZ})`,
-      `Yaw: ${glMatrix.toDegree(camera.yaw).toFixed(1)}, Pitch: ${glMatrix.toDegree(camera.pitch).toFixed(1)}`,
-      "",
-      `Chunks: ${loadedChunks.size} loaded, ${chunks.size} total`,
-      `Chunk: ${getChunkPos(camX, camZ).join(", ")} (Pos in chunk: ${wrapPosToChunkSize(camX, camY, camZ).join(", ")})`,
-      "",
-      `Block: ${blockId !== null ? blocksById[blockId].name : "<none>"}`
-    ].join("\n")
-  }
-
   loadedChunks.clear()
   loadChunksAround(camera.x, camera.z, renderDistance)
 
@@ -186,10 +160,25 @@ function draw() {
   gl.uniform3f(programs.block.uniform.u_cameraPos, camera.x, camera.y, camera.z)
   gl.uniform1f(programs.block.uniform.u_renderDistance, renderDistance * CHUNK_SIZE)
 
-  drawChunks()
+  let faceCount = drawChunks()
 
   if (showDebug) {
-    let [chunkX, chunkZ] = getChunkPos(camera.x, camera.z), points
+    let camX = Math.floor(camera.x), camY = Math.floor(camera.y), camZ = Math.floor(camera.z)
+    let blockId = getBlockIdAt(camX, camY, camZ)
+
+    debugElem.innerText = [
+      `${lastFrameTimes.length} FPS`,
+      "",
+      `Pos: ${camera.x.toFixed(2)}, ${camera.y.toFixed(4)}, ${camera.z.toFixed(2)} (Block: ${camX}, ${camY}, ${camZ})`,
+      `Yaw: ${glMatrix.toDegree(camera.yaw).toFixed(1)}, Pitch: ${glMatrix.toDegree(camera.pitch).toFixed(1)}`,
+      "",
+      `Chunks: ${loadedChunks.size} loaded, ${chunks.size} total (${maxChunksInMemory} max), ${faceCount} faces drawn`,
+      `Chunk: ${getChunkPos(camX, camZ).join(", ")} (Pos in chunk: ${wrapPosToChunkSize(camX, camY, camZ).join(", ")})`,
+      "",
+      `Block: ${blockId !== null ? blocksById[blockId].name : "<none>"}`
+    ].join("\n")
+
+    let [chunkX, chunkZ] = getChunkPos(camX, camZ), points
 
     useProgram(programs.project)
     setProjectionMatrices(programs.project)

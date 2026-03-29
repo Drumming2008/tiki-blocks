@@ -84,7 +84,7 @@ function generateChunk(chunkX, chunkZ) {
 
       let land3DAmount = sampleLand3DAmount(worldX, worldZ) * hillDampening
 
-      let maxY = 1, wasSolid = true
+      let maxY = 1
       blocks[layerIndex] = Block.BEDROCK
 
       for (let y = 1; y <= CHUNK_HEIGHT; y++) {

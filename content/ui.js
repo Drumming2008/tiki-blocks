@@ -145,7 +145,6 @@ for (let k of keybinds) {
 }
 
 function uiSliderInput(elem) {
-  console.log("sdl;kj")
   if (elem == id("fov-slider")) {
     FOV = glMatrix.toRadian(elem.getAttribute("value"))
     resizeCanvas()

@@ -2,6 +2,8 @@
 
 let renderDistance = 16
 
+let maxChunksInMemory = Math.max(1000, Math.ceil(Math.PI * (1.25 * renderDistance) ** 2))
+
 // cannot be bigger than 32, 256 or many things will die
 const CHUNK_SIZE = 32, CHUNK_HEIGHT = 256
 

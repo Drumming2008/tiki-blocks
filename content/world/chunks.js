@@ -87,6 +87,7 @@ async function loadChunk(x, z) {
   chunks.set(key, { loading: true })
 
   let chunk = await queueGenerateTask(x, z)
+  chunk.key = key
   chunks.set(key, chunk)
 
   chunk.x = x
@@ -345,16 +346,39 @@ function receiveMessage({ data: { id, data } }) {
   messageReceivedCallbacks.delete(id)
 }
 
+function saveAndDeleteChunk(chunk) {
+  // TODO save
+
+  gl.deleteBuffer(chunk.faces.posBuffer)
+  gl.deleteBuffer(chunk.faces.negBuffer)
+
+  chunks.delete(chunk.key)
+}
+
 function chunkKey(x, z) {
   return `${x}:${z}`
 }
 
 function drawChunks() {
+  let faceCount = 0
+
+  let floatCamX = camera.x / CHUNK_SIZE, floatCamZ = camera.z / CHUNK_SIZE
   let [camX, camZ] = getChunkPos(camera.x, camera.z)
 
-  for (let key of loadedChunks) {
-    let chunk = chunks.get(key)
+  let unloaded = chunks.size > maxChunksInMemory ? [] : null
+
+  for (let [key, chunk] of chunks.entries()) {
     if (chunk.loading) continue
+
+    if (!loadedChunks.has(key)) {
+      if (unloaded) {
+        let dist = Math.hypot(chunk.x - floatCamX, chunk.z - floatCamZ)
+        if (dist >= renderDistance * 1.2) {
+          unloaded.push({ chunk, dist })
+        }
+      }
+      continue
+    }
 
     let { lengths, posBuffer, negBuffer } = chunk.faces
 
@@ -364,6 +388,8 @@ function drawChunks() {
     let posStart = px ? 0 : lengths.pos.x
     let posCount = (px ? lengths.pos.x : 0) + lengths.pos.y + (pz ? lengths.pos.z : 0)
     if (posCount) {
+      faceCount += posCount
+
       gl.bindBuffer(gl.ARRAY_BUFFER, posBuffer)
       gl.vertexAttribIPointer(programs.block.attrib.a_data, 1, gl.INT, 0, posStart * 4)
       gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, posCount)
@@ -373,9 +399,21 @@ function drawChunks() {
     let negStart = nx ? 0 : lengths.neg.x
     let negCount = (nx ? lengths.neg.x : 0) + lengths.neg.y + (nz ? lengths.neg.z : 0)
     if (negCount) {
+      faceCount += negCount
+
       gl.bindBuffer(gl.ARRAY_BUFFER, negBuffer)
       gl.vertexAttribIPointer(programs.block.attrib.a_data, 1, gl.INT, 0, negStart * 4)
       gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, negCount)
     }
   }
+
+  if (unloaded) {
+    unloaded.sort((a, b) => b.dist - a.dist)
+    let count = Math.min(unloaded.length, chunks.size - maxChunksInMemory)
+    for (let i = 0; i < count; i++) {
+      saveAndDeleteChunk(unloaded[i].chunk)
+    }
+  }
+
+  return faceCount
 }

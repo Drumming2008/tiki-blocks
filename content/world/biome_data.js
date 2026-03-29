@@ -3,8 +3,8 @@ const humidityCutoffs = [-0.4, 0, 0.4]
 
 const biomeTable = [
   //   0   <----- humidity ----->   3       temp v
-  ["cheese", "cheese", "cheese",  "stone" ], // 0
-  ["cheese", "stone",  "plains",  "plains"],
+  ["cheese", "cheese", "cheese", "stone" ], // 0
+  ["cheese", "stone",  "plains", "plains"],
   ["plains", "plains", "plains", "desert"],
   ["desert", "desert", "desert", "desert"]  // 3
 ]
