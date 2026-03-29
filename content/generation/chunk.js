@@ -60,7 +60,9 @@ function computeFaces({ blocks, heightmap }) {
 }
 
 function generateChunk(chunkX, chunkZ) {
-  let blocks = new Uint8Array(CHUNK_LEN), heightmap = new Uint8Array(CHUNK_LAYER_LEN)
+  let blockBuffer = new ArrayBuffer(CHUNK_LEN, { maxByteLength: CHUNK_LEN })
+  let blocks = new Uint8Array(blockBuffer), heightmap = new Uint8Array(CHUNK_LAYER_LEN)
+  let maxH = 0
 
   for (let x = 0; x < CHUNK_SIZE; x++) {
     let worldX = x + chunkX * CHUNK_SIZE
@@ -109,8 +111,11 @@ function generateChunk(chunkX, chunkZ) {
       }
 
       heightmap[layerIndex] = maxY
+      if (maxY > maxH) maxH = maxY
     }
   }
+
+  blockBuffer.resize((maxH + 1) * CHUNK_LAYER_LEN)
 
   return { blocks, heightmap }
 }

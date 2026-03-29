@@ -33,6 +33,7 @@ class Chunk {
     // jsdoc jumpscare
     /** @type {{ posData: Int32Array, negData: Int32Array, posBuffer: WebGLBuffer, negBuffer: WebGLBuffer, lengths: { pos: { x: number, y: number, z: number, padding: number }, neg: { x: number, y: number, z: number, padding: number } } }} */
     this.faces = faces
+    this.maxBlockHeight = Math.floor(blocks.length / CHUNK_LAYER_LEN)
 
     this.loading = false
   }
@@ -42,7 +43,10 @@ class Chunk {
   }
 
   getBlock(x, y, z) {
-    return this.blocks[Chunk.blockIndex(x, y, z)]
+    if (x < 0 || y < 0 || z < 0 || x >= CHUNK_SIZE || y >= CHUNK_HEIGHT || z >= CHUNK_SIZE) {
+      return null
+    }
+    return y > this.maxBlockHeight ? Block.AIR : this.blocks[Chunk.blockIndex(x, y, z)]
   }
 
   getBlockWorld(x, y, z) {
