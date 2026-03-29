@@ -165,6 +165,7 @@ function draw() {
   if (showDebug) {
     let camX = Math.floor(camera.x), camY = Math.floor(camera.y), camZ = Math.floor(camera.z)
     let blockId = getBlockIdAt(camX, camY, camZ)
+    let chunk = getChunk(...getChunkPos(camX, camZ))
 
     debugElem.innerText = [
       `${lastFrameTimes.length} FPS`,
@@ -173,7 +174,7 @@ function draw() {
       `Yaw: ${glMatrix.toDegree(camera.yaw).toFixed(1)}, Pitch: ${glMatrix.toDegree(camera.pitch).toFixed(1)}`,
       "",
       `Chunks: ${loadedChunks.size} loaded, ${chunks.size} total (${maxChunksInMemory} max), ${faceCount} faces drawn`,
-      `Chunk: ${getChunkPos(camX, camZ).join(", ")} (Pos in chunk: ${wrapPosToChunkSize(camX, camY, camZ).join(", ")})`,
+      `Chunk: ${chunk.x}, ${chunk.z} (Pos in chunk: ${camX - chunk.worldX}, ${camY}, ${camZ - chunk.worldZ})`,
       "",
       `Block: ${blockId !== null ? blocksById[blockId].name : "<none>"}`
     ].join("\n")

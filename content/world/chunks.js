@@ -3,22 +3,65 @@ let chunks = new Map(), loadedChunks = new Set()
 const seed = (Math.random() * 0x100000000) ^ Date.now()
 console.log("SEED:", seed)
 
+class Chunk {
+  static blockIndex(x, y, z) {
+    return x + z * CHUNK_SIZE + y * CHUNK_LAYER_LEN
+  }
+
+  static layerIndex(x, z) {
+    return x + z * CHUNK_SIZE
+  }
+
+  constructor(x, z, data = null) {
+    this.x = x
+    this.z = z
+    this.worldX = x * CHUNK_SIZE
+    this.worldZ = z * CHUNK_SIZE
+    this.key = chunkKey(x, z)
+
+    if (data) {
+      this.setData(data)
+      this.loading = false
+    } else {
+      this.loading = true
+    }
+  }
+
+  setData({ blocks, heightmap, faces }) {
+    this.blocks = blocks
+    this.heightmap = heightmap
+    // jsdoc jumpscare
+    /** @type {{ posData: Int32Array, negData: Int32Array, posBuffer: WebGLBuffer, negBuffer: WebGLBuffer, lengths: { pos: { x: number, y: number, z: number, padding: number }, neg: { x: number, y: number, z: number, padding: number } } }} */
+    this.faces = faces
+
+    this.loading = false
+  }
+
+  sampleHeightmap(x, z) {
+    return this.heightmap[Chunk.layerIndex(x, z)]
+  }
+
+  getBlock(x, y, z) {
+    return this.blocks[Chunk.blockIndex(x, y, z)]
+  }
+
+  getBlockWorld(x, y, z) {
+    return this.getBlock(x - this.worldX, y, z - this.worldZ)
+  }
+}
+
 function getBlockIdAt(x, y, z) {
   if (y < 0 || y >= CHUNK_HEIGHT) return null
 
   let chunk = getChunk(...getChunkPos(x, z))
   if (!chunk) return null
 
-  return chunk.blocks[chunkBlockIndex(...wrapPosToChunkSize(x, y, z))]
+  return chunk.getBlockWorld(x, y, z)
 }
 
 function wrapPosToChunkSize(x, y, z) {
   let [chunkX, chunkZ] = getChunkPos(x, z)
   return [x - chunkX * CHUNK_SIZE, y, z - chunkZ * CHUNK_SIZE]
-}
-
-function chunkBlockIndex(x, y, z) {
-  return x + z * CHUNK_SIZE + y * CHUNK_LAYER_LEN
 }
 
 function getChunk(x, z, includeLoading = false) {
@@ -29,10 +72,6 @@ function getChunk(x, z, includeLoading = false) {
 
 function getChunkPos(x, z) {
   return [Math.floor(x / CHUNK_SIZE), Math.floor(z / CHUNK_SIZE)]
-}
-
-function sampleHeightmap(chunk, x, z) {
-  return chunk.heightmap[x + z * CHUNK_SIZE]
 }
 
 let workers = Array.from({ length: 4 }, () => {
@@ -84,22 +123,20 @@ async function loadChunk(x, z) {
 
   if (chunks.has(key)) return
 
-  chunks.set(key, { loading: true })
-
-  let chunk = await queueGenerateTask(x, z)
-  chunk.key = key
+  let chunk = new Chunk(x, z)
   chunks.set(key, chunk)
 
-  chunk.x = x
-  chunk.z = z
+  let data = await queueGenerateTask(x, z), { faces } = data
 
-  chunk.faces.posBuffer = gl.createBuffer()
-  gl.bindBuffer(gl.ARRAY_BUFFER, chunk.faces.posBuffer)
-  gl.bufferData(gl.ARRAY_BUFFER, chunk.faces.posData, gl.STATIC_DRAW)
+  faces.posBuffer = gl.createBuffer()
+  gl.bindBuffer(gl.ARRAY_BUFFER, faces.posBuffer)
+  gl.bufferData(gl.ARRAY_BUFFER, faces.posData, gl.STATIC_DRAW)
 
-  chunk.faces.negBuffer = gl.createBuffer()
-  gl.bindBuffer(gl.ARRAY_BUFFER, chunk.faces.negBuffer)
-  gl.bufferData(gl.ARRAY_BUFFER, chunk.faces.negData, gl.STATIC_DRAW)
+  faces.negBuffer = gl.createBuffer()
+  gl.bindBuffer(gl.ARRAY_BUFFER, faces.negBuffer)
+  gl.bufferData(gl.ARRAY_BUFFER, faces.negData, gl.STATIC_DRAW)
+
+  chunk.setData(data)
 
   // tttttttt 0rrfffzz zzzxxxxx yyyyyyyy
 
@@ -117,22 +154,22 @@ async function loadChunk(x, z) {
       let otherBlockDataXZ = z << 13
       let blockDataXZ = blockDataX | otherBlockDataXZ
 
-      let ownH = sampleHeightmap(chunk, CHUNK_SIZE - 1, z)
-      let otherH = sampleHeightmap(px, 0, z)
+      let ownH = chunk.sampleHeightmap(CHUNK_SIZE - 1, z)
+      let otherH = px.sampleHeightmap(0, z)
 
       for (let y = 0; y <= ownH; y++) {
-        let data = blocksById[chunk.blocks[chunkBlockIndex(CHUNK_SIZE - 1, y, z)]]
+        let data = blocksById[chunk.getBlock(CHUNK_SIZE - 1, y, z)]
         if (data.invisible) continue
-        if (y <= otherH && !blocksById[px.blocks[chunkBlockIndex(0, y, z)]].transparent) continue
+        if (y <= otherH && !blocksById[px.getBlock(0, y, z)].transparent) continue
 
         let tex = blockTextureIndices[data.texture]
         pxFaces.push(blockDataXZ | y | tex << 24 | 2 << 18)
       }
 
       for (let y = 0; y <= otherH; y++) {
-        let data = blocksById[px.blocks[chunkBlockIndex(0, y, z)]]
+        let data = blocksById[px.getBlock(0, y, z)]
         if (data.invisible) continue
-        if (y <= ownH && !blocksById[chunk.blocks[chunkBlockIndex(CHUNK_SIZE - 1, y, z)]].transparent) continue
+        if (y <= ownH && !blocksById[chunk.getBlock(CHUNK_SIZE - 1, y, z)].transparent) continue
 
         let tex = blockTextureIndices[data.texture]
         otherFaces.push(otherBlockDataXZ | y | tex << 24 | 3 << 18)
@@ -150,22 +187,22 @@ async function loadChunk(x, z) {
       let blockDataXZ = z << 13
       let otherBlockDataXZ = otherBlockDataX | blockDataXZ
 
-      let ownH = sampleHeightmap(chunk, 0, z)
-      let otherH = sampleHeightmap(nx, CHUNK_SIZE - 1, z)
+      let ownH = chunk.sampleHeightmap(0, z)
+      let otherH = nx.sampleHeightmap(CHUNK_SIZE - 1, z)
 
       for (let y = 0; y <= ownH; y++) {
-        let data = blocksById[chunk.blocks[chunkBlockIndex(0, y, z)]]
+        let data = blocksById[chunk.getBlock(0, y, z)]
         if (data.invisible) continue
-        if (y <= otherH && !blocksById[nx.blocks[chunkBlockIndex(CHUNK_SIZE - 1, y, z)]].transparent) continue
+        if (y <= otherH && !blocksById[nx.getBlock(CHUNK_SIZE - 1, y, z)].transparent) continue
 
         let tex = blockTextureIndices[data.texture]
         nxFaces.push(blockDataXZ | y | tex << 24 | 3 << 18)
       }
 
       for (let y = 0; y <= otherH; y++) {
-        let data = blocksById[nx.blocks[chunkBlockIndex(CHUNK_SIZE - 1, y, z)]]
+        let data = blocksById[nx.getBlock(CHUNK_SIZE - 1, y, z)]
         if (data.invisible) continue
-        if (y <= ownH && !blocksById[chunk.blocks[chunkBlockIndex(0, y, z)]].transparent) continue
+        if (y <= ownH && !blocksById[chunk.getBlock(0, y, z)].transparent) continue
 
         let tex = blockTextureIndices[data.texture]
         otherFaces.push(otherBlockDataXZ | y | tex << 24 | 2 << 18)
@@ -183,22 +220,22 @@ async function loadChunk(x, z) {
       let otherBlockDataXZ = x << 8
       let blockDataXZ = blockDataZ | otherBlockDataXZ
 
-      let ownH = sampleHeightmap(chunk, x, CHUNK_SIZE - 1)
-      let otherH = sampleHeightmap(pz, x, 0)
+      let ownH = chunk.sampleHeightmap(x, CHUNK_SIZE - 1)
+      let otherH = pz.sampleHeightmap(x, 0)
 
       for (let y = 0; y <= ownH; y++) {
-        let data = blocksById[chunk.blocks[chunkBlockIndex(x, y, CHUNK_SIZE - 1)]]
+        let data = blocksById[chunk.getBlock(x, y, CHUNK_SIZE - 1)]
         if (data.invisible) continue
-        if (y <= otherH && !blocksById[pz.blocks[chunkBlockIndex(x, y, 0)]].transparent) continue
+        if (y <= otherH && !blocksById[pz.getBlock(x, y, 0)].transparent) continue
 
         let tex = blockTextureIndices[data.texture]
         pzFaces.push(blockDataXZ | y | tex << 24 | 4 << 18)
       }
 
       for (let y = 0; y <= otherH; y++) {
-        let data = blocksById[pz.blocks[chunkBlockIndex(x, y, 0)]]
+        let data = blocksById[pz.getBlock(x, y, 0)]
         if (data.invisible) continue
-        if (y <= ownH && !blocksById[chunk.blocks[chunkBlockIndex(x, y, CHUNK_SIZE - 1)]].transparent) continue
+        if (y <= ownH && !blocksById[chunk.getBlock(x, y, CHUNK_SIZE - 1)].transparent) continue
 
         let tex = blockTextureIndices[data.texture]
         otherFaces.push(otherBlockDataXZ | y | tex << 24 | 5 << 18)
@@ -216,22 +253,22 @@ async function loadChunk(x, z) {
       let blockDataXZ = x << 8
       let otherBlockDataXZ = otherBlockDataZ | blockDataXZ
 
-      let ownH = sampleHeightmap(chunk, x, 0)
-      let otherH = sampleHeightmap(nz, x, CHUNK_SIZE - 1)
+      let ownH = chunk.sampleHeightmap(x, 0)
+      let otherH = nz.sampleHeightmap(x, CHUNK_SIZE - 1)
 
       for (let y = 0; y <= ownH; y++) {
-        let data = blocksById[chunk.blocks[chunkBlockIndex(x, y, 0)]]
+        let data = blocksById[chunk.getBlock(x, y, 0)]
         if (data.invisible) continue
-        if (y <= otherH && !blocksById[nz.blocks[chunkBlockIndex(x, y, CHUNK_SIZE - 1)]].transparent) continue
+        if (y <= otherH && !blocksById[nz.getBlock(x, y, CHUNK_SIZE - 1)].transparent) continue
 
         let tex = blockTextureIndices[data.texture]
         nzFaces.push(blockDataXZ | y | tex << 24 | 5 << 18)
       }
 
       for (let y = 0; y <= otherH; y++) {
-        let data = blocksById[nz.blocks[chunkBlockIndex(x, y, CHUNK_SIZE - 1)]]
+        let data = blocksById[nz.getBlock(x, y, CHUNK_SIZE - 1)]
         if (data.invisible) continue
-        if (y <= ownH && !blocksById[chunk.blocks[chunkBlockIndex(x, y, 0)]].transparent) continue
+        if (y <= ownH && !blocksById[chunk.getBlock(x, y, 0)].transparent) continue
 
         let tex = blockTextureIndices[data.texture]
         otherFaces.push(otherBlockDataXZ | y | tex << 24 | 4 << 18)
