@@ -29,7 +29,7 @@ const rawBlocks = {
   },
   BEDROCK: {
     id: 5,
-    name: "Bedrock (cheeserock)",
+    name: "Bedrock",
     texture: "bedrock"
   },
   STONE: {
