@@ -6,6 +6,10 @@ class Perlin3D {
 
   randCache = new Map()
 
+  clearCache() {
+    this.randCache.clear()
+  }
+
   rand(x, y, z) {
     let key = `${x}:${y}:${z}`
 
@@ -14,7 +18,6 @@ class Perlin3D {
     }
 
     let random = seededRandom(hashString(key) ^ this.seed)
-    void random(), random(), random(), random()
 
     let vec = this.normalize(random() * 2 - 1, (random() - 0.5) * 2 * this.flattening, random() * 2 - 1)
     this.randCache.set(key, vec)
@@ -95,5 +98,11 @@ class OctavePerlin3D {
     return this.octaves.reduce((sum, { scale, yScale = 1, magnitude, offset, perlin }) => {
       return sum + perlin.sample((x + offset[0]) / scale, (y + offset[1]) / (scale * yScale), (z + offset[2]) / scale) * magnitude
     }, 0)
+  }
+
+  clearCache() {
+    for (let octave of this.octaves) {
+      octave.perlin.clearCache()
+    }
   }
 }

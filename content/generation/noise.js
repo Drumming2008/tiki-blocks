@@ -18,24 +18,23 @@ function initNoise(seed) {
       { scale: s * 30, magnitude: 0.03 }
     ]),
     land3D: new OctavePerlin3D(random(), [
-      { scale: 20, magnitude: 1 }
-      // { scale: 10, magnitude: 0.2 }
+      { scale: s * 20, magnitude: 1 }
     ]),
     beachiness: new OctavePerlin2D(random(), [
-      { scale: 400, magnitude: 1 },
-      { scale: 80, magnitude: 0.2 },
-      { scale: 10, magnitude: 0.03 }
+      { scale: s * 400, magnitude: 1 },
+      { scale: s * 80, magnitude: 0.2 },
+      { scale: s * 10, magnitude: 0.03 }
     ]),
     hills: new OctavePerlin2D(random(), [
-      { scale: 120, magnitude: 1 },
-      { scale: 50, magnitude: 0.3 }
+      { scale: s * 120, magnitude: 1 },
+      { scale: s * 50, magnitude: 0.3 }
     ]),
     hilliness: new OctavePerlin2D(random(), [
-      { scale: 800, magnitude: 1 },
-      { scale: 200, magnitude: 1 },
+      { scale: s * 800, magnitude: 1 },
+      { scale: s * 200, magnitude: 1 },
     ]),
     land3DAmount: new OctavePerlin2D(random(), [
-      { scale: 200, magnitude: 1 }
+      { scale: s * 200, magnitude: 1 }
     ]),
     humidity: new OctavePerlin2D(random(), [
       { scale: s * 1500, magnitude: 1 },
@@ -48,24 +47,24 @@ function initNoise(seed) {
       { scale: s * 200, magnitude: 0.2 }
     ]),
     biomeOffsetX: new OctavePerlin2D(random(), [
-      { scale: 32, magnitude: 1 },
-      { scale: 6, magnitude: 0.3 }
+      { scale: s * 32, magnitude: 1 },
+      { scale: s * 6, magnitude: 0.3 }
     ]),
     biomeOffsetZ: new OctavePerlin2D(random(), [
-      { scale: 32, magnitude: 1 },
-      { scale: 6, magnitude: 0.3 }
+      { scale: s * 32, magnitude: 1 },
+      { scale: s * 6, magnitude: 0.3 }
     ]),
     noodleCaveA: new OctavePerlin3D(random(), [
-      { scale: 80, yScale: 0.6, magnitude: 1 },
-      { scale: 30, yScale: 0.6, magnitude: 0.3 }
+      { scale: s * 80, yScale: 0.6, magnitude: 1 },
+      { scale: s * 30, yScale: 0.6, magnitude: 0.3 }
     ], 0.5),
     noodleCaveB: new OctavePerlin3D(random(), [
-      { scale: 110, yScale: 0.6, magnitude: 1 },
-      { scale: 40, yScale: 0.6, magnitude: 0.3 }
+      { scale: s * 110, yScale: 0.6, magnitude: 1 },
+      { scale: s * 40, yScale: 0.6, magnitude: 0.3 }
     ], 0.5),
     cheeseCave: new OctavePerlin3D(random(), [
-      { scale: 40, yScale: 0.7, magnitude: 1 },
-      { scale: 15, yScale: 0.7, magnitude: 0.3 }
+      { scale: s * 40, yScale: 0.7, magnitude: 1 },
+      { scale: s * 15, yScale: 0.7, magnitude: 0.3 }
     ], 2.5)
   }
 }

@@ -122,6 +122,10 @@ function generateChunk(chunkX, chunkZ) {
 
   blockBuffer.resize((maxH + 1) * CHUNK_LAYER_LEN)
 
+  for (let name in noise) {
+    noise[name].clearCache()
+  }
+
   return { blocks, heightmap }
 }
 

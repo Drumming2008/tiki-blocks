@@ -5,6 +5,10 @@ class Perlin2D {
 
   randCache = new Map()
 
+  clearCache() {
+    this.randCache.clear()
+  }
+
   rand(x, y) {
     let key = `${x}:${y}`
 
@@ -13,7 +17,6 @@ class Perlin2D {
     }
 
     let random = seededRandom(hashString(key) ^ this.seed)
-    void random(), random(), random(), random()
 
     let vec = this.normalize(random() * 2 - 1, random() * 2 - 1)
     this.randCache.set(key, vec)
@@ -83,5 +86,11 @@ class OctavePerlin2D {
     }, 0)
     if (isNaN(noise)) debugger
     return noise
+  }
+
+  clearCache() {
+    for (let octave of this.octaves) {
+      octave.perlin.clearCache()
+    }
   }
 }
