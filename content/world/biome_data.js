@@ -9,11 +9,11 @@ const biomeTable = [
   ["desert", "desert", "desert", "desert"]  // 3
 ]
 
-function biomeTableLookup(temp, humidity) {
-  let tempIndex = temperatureCutoffs.findLastIndex(min => min <= temp) + 1
+function biomeTableLookup(temperature, humidity) {
+  let temperatureIndex = temperatureCutoffs.findLastIndex(min => min <= temperature) + 1
   let humidityIndex = humidityCutoffs.findLastIndex(min => min <= humidity) + 1
 
-  return biomes[biomeTable[tempIndex][humidityIndex]]
+  return biomes[biomeTable[temperatureIndex][humidityIndex]]
 }
 
 const biomes = {

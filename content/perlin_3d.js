@@ -1,6 +1,7 @@
 class Perlin3D {
-  constructor(seed) {
+  constructor(seed, flattening = 1) {
     this.seed = seed
+    this.flattening = flattening
   }
 
   randCache = new Map()
@@ -15,7 +16,7 @@ class Perlin3D {
     let random = seededRandom(hashString(key) ^ this.seed)
     void random(), random(), random(), random()
 
-    let vec = this.normalize(random() * 2 - 1, random() * 2 - 1, random() * 2 - 1)
+    let vec = this.normalize(random() * 2 - 1, (random() - 0.5) * 2 * this.flattening, random() * 2 - 1)
     this.randCache.set(key, vec)
     return vec
   }
@@ -79,9 +80,9 @@ class Perlin3D {
 }
 
 class OctavePerlin3D {
-  constructor(seed, octaves) {
+  constructor(seed, octaves, flattening = 1) {
     this.octaves = octaves.map(octave => {
-      let perlin = new Perlin3D(seed)
+      let perlin = new Perlin3D(seed, flattening)
       return {
         perlin,
         ...octave,

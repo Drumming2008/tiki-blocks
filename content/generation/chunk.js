@@ -1,6 +1,6 @@
 importScripts("../world/block_data.js", "../world/biome_data.js")
 
-const DO_CAVES = false
+const DO_NOODLE_CAVES = false, DO_CHEESE_CAVES = false
 
 const paddingArray = Array(FACE_BUFFER_PADDING).fill(0)
 
@@ -92,7 +92,8 @@ function generateChunk(chunkX, chunkZ) {
       blocks[layerIndex] = Block.BEDROCK
 
       for (let y = 1; y <= CHUNK_HEIGHT; y++) {
-        if (DO_CAVES && isNoodleCave(0.04, worldX, y, worldZ)) continue
+        if (DO_NOODLE_CAVES && isNoodleCave(0.04, worldX, y, worldZ)) continue
+        if (DO_CHEESE_CAVES && isCheeseCave(-0.3, worldX, y, worldZ)) continue
 
         let density = (approxHeight - y) / land3DAmount
 

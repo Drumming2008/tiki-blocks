@@ -10,7 +10,7 @@ t = texture index
 */
 
 const float[] FACE_BRIGHTNESS = float[](
-    1.0, 0.5, 0.8, 0.8, 0.6, 0.6
+    1.0, 0.55, 0.8, 0.8, 0.65, 0.65
 );
 
 in int a_data;

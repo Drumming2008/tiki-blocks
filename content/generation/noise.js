@@ -40,27 +40,33 @@ function initNoise(seed) {
     humidity: new OctavePerlin2D(random(), [
       { scale: s * 1500, magnitude: 1 },
       { scale: s * 700, magnitude: 0.5 },
-      { scale: 32, magnitude: 0.02 },
-      { scale: 6, magnitude: 0.005 }
+      { scale: s * 200, magnitude: 0.2 }
     ]),
     temperature: new OctavePerlin2D(random(), [
       { scale: s * 1500, magnitude: 1 },
       { scale: s * 700, magnitude: 0.5 },
-      { scale: 32, magnitude: 0.02 },
-      { scale: 6, magnitude: 0.005 }
+      { scale: s * 200, magnitude: 0.2 }
     ]),
-    noodleCaviness: new OctavePerlin3D(random(), [
-      { scale: 400, yScale: 0.5, magnitude: 1 },
-      { scale: 150, yScale: 0.5, magnitude: 0.4 }
+    biomeOffsetX: new OctavePerlin2D(random(), [
+      { scale: 32, magnitude: 1 },
+      { scale: 6, magnitude: 0.3 }
+    ]),
+    biomeOffsetZ: new OctavePerlin2D(random(), [
+      { scale: 32, magnitude: 1 },
+      { scale: 6, magnitude: 0.3 }
     ]),
     noodleCaveA: new OctavePerlin3D(random(), [
-      { scale: 90, yScale: 0.7, magnitude: 1 },
-      { scale: 40, yScale: 0.7, magnitude: 0.3 }
-    ]),
+      { scale: 80, yScale: 0.6, magnitude: 1 },
+      { scale: 30, yScale: 0.6, magnitude: 0.3 }
+    ], 0.5),
     noodleCaveB: new OctavePerlin3D(random(), [
-      { scale: 150, yScale: 0.7, magnitude: 1 },
-      { scale: 60, yScale: 0.7, magnitude: 0.3 }
-    ])
+      { scale: 110, yScale: 0.6, magnitude: 1 },
+      { scale: 40, yScale: 0.6, magnitude: 0.3 }
+    ], 0.5),
+    cheeseCave: new OctavePerlin3D(random(), [
+      { scale: 40, yScale: 0.7, magnitude: 1 },
+      { scale: 15, yScale: 0.7, magnitude: 0.3 }
+    ], 2.5)
   }
 }
 
@@ -133,11 +139,20 @@ function sampleLand3DAmount(x, z) {
 }
 
 function sampleBiome(x, z) {
-  let temp = noise.temperature.sample(x, z), humidity = noise.humidity.sample(x, z)
-  return biomeTableLookup(temp, humidity)
+  let offsetX = noise.biomeOffsetX.sample(x, z) * 15
+  let offsetZ = noise.biomeOffsetZ.sample(x, z) * 15
+
+  let temperature = noise.temperature.sample(x + offsetX, z + offsetZ)
+  let humidity    = noise.humidity   .sample(x + offsetX, z + offsetZ)
+
+  return biomeTableLookup(temperature, humidity)
 }
 
 function isNoodleCave(caviness, x, y, z)  {
   return Math.abs(noise.noodleCaveA.sample(x, y, z)) < caviness
       && Math.abs(noise.noodleCaveB.sample(x, y, z)) < caviness
+}
+
+function isCheeseCave(threshold, x, y, z) {
+  return noise.cheeseCave.sample(x, y, z) < threshold
 }
