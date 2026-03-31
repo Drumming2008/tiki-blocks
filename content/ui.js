@@ -23,6 +23,16 @@ id("close-keybinds").onclick = () => {
 }
 
 class UISlider extends HTMLElement {
+  static currentDragging = null
+  static {
+    document.addEventListener("mousemove", e => {
+      this.currentDragging?.updateDrag(e)
+    })
+    document.addEventListener("mouseup", () => {
+      this.currentDragging = null
+    })
+  }
+
   constructor() {
     super()
     let shadow = this.attachShadow({ mode: "open" })
@@ -49,34 +59,20 @@ class UISlider extends HTMLElement {
     this.thumb.id = "slider-thumb"
     this.track.append(this.thumb)
 
-    this.dragging = false
-
     this.thumb.onmousedown = () => {
-      this.dragging = true
+      UISlider.currentDragging = this
     }
+  }
 
-    document.addEventListener("mouseup", () => {
-      this.dragging = false
-    })
+  updateDrag(e) {
+    let trackBox = this.track.getBoundingClientRect()
+    let percent = clamp(this.getPercent(e.clientX, trackBox.left, trackBox.right), 0, 100)
 
-    document.addEventListener("mousemove", e => {
-      if (this.dragging) {
-        let trackBox = this.track.getBoundingClientRect()
-        let percent = this.getPercent(e.clientX, trackBox.left, trackBox.right)
+    this.setAttribute("value", Math.round(this.getValue(percent, this.min, this.max)))
 
-        if (percent > 100) {
-          this.setAttribute("value", this.max)
-          percent = 100
-        } else if (percent < 0) {
-          this.setAttribute("value", this.min)
-          percent = 0
-        } else this.setAttribute("value", Math.round(this.getValue(percent, this.min, this.max)))
+    this.thumb.style.left = `${percent}%`
 
-        this.thumb.style.left = `${percent}%`
-
-        this.updateSlider(true)
-      }
-    })
+    this.updateSlider(true)
   }
 
   connectedCallback() {

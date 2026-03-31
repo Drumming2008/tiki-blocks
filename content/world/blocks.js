@@ -17,7 +17,7 @@ for (let i = 0; i < blockTextures.length; i++) {
 
 let blockTexture = createTexture(BLOCK_TEXTURE_SIZE, BLOCK_TEXTURE_SIZE, blockTextures.length, null, true)
 
-function getBlockId(x, y, z) {
+function getBlock(x, y, z) {
   if (y < 0 || y >= CHUNK_HEIGHT) return null
 
   let chunk = getChunk(...getChunkPos(x, z))
