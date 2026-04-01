@@ -110,34 +110,35 @@ function setInputWidth(input) {
   document.body.append(span)
   let box = span.getBoundingClientRect()
   input.style.setProperty("--width", box.width + "px")
-  // span.remove()
+  span.remove()
 }
 
-function setKeybindValue(input, value) {
+function setKeybindValue(input, value, k) {
   input.value = value.toUpperCase().replace(" ", "SPACE").replace("ALT", "OPTION").replace("META", "COMMAND").replace("BACKSPACE", "DELETE")
+  keybinds[k].key = value
   setInputWidth(input)
 }
 
-function createKeybind(k) {
+function createKeybind(v, k) {
   let wrapper = document.createElement("div")
   wrapper.classList.add("keybind-wrapper")
   id("keybinds-scroller").append(wrapper)
 
   let desc = document.createElement("span")
-  desc.innerText = k.desc
+  desc.innerText = v.desc
   wrapper.append(desc)
 
   let input = document.createElement("input")
   input.onkeydown = e => {
     e.preventDefault()
-    setKeybindValue(input, e.key)
+    setKeybindValue(input, e.key, k)
   }
   wrapper.append(input)
-  setKeybindValue(input, k.default)
+  setKeybindValue(input, v.default, k)
 }
 
-for (let k of keybinds) {
-  createKeybind(k)
+for (let [k, v] of Object.entries(keybinds)) {
+  createKeybind(v, k)
 }
 
 function uiSliderInput(elem) {

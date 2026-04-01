@@ -49,34 +49,38 @@ onmousemove = e => {
   }
 }
 
-let keybinds = [
-  {
+let keybinds = {
+  walkFwd: {
     default: "w",
     desc: "Walk Forward"
   },
-  {
+  walkBkwd: {
     default: "s",
     desc: "Walk Backward"
   },
-  {
+  walkLeft: {
     default: "a",
     desc: "Walk Left"
   },
-  {
+  walkRight: {
     default: "d",
     desc: "Walk Right"
   },
-  {
+  jump: {
     default: " ",
     desc: "Jump"
   }
-]
+}
+
+for (let v of Object.values(keybinds)) {
+  v.key = v.default
+}
 
 let keysDown = {}
 onkeydown = e => {
   if (e.metaKey || e.repeat) return
 
-  keysDown[e.code] = "press"
+  keysDown[e.key] = "press"
 
   if (e.code === "Escape") {
     e.preventDefault()
@@ -85,32 +89,10 @@ onkeydown = e => {
 }
 
 onkeyup = e => {
-  keysDown[e.code] = false
+  keysDown[e.key] = false
 }
 
 function processKeys() {
-  const MOVE_SPEED = 0.5
-
-  camera.pitch = clamp(camera.pitch, -Math.PI / 2, Math.PI / 2)
-  camera.yaw %= 2 * Math.PI
-  while (camera.yaw < 0) camera.yaw += 2 * Math.PI
-
-  if (keysDown.Space) camera.y += MOVE_SPEED
-  if (keysDown.ShiftLeft) camera.y -= MOVE_SPEED
-
-  let fwd = 0, right = 0
-  if (keysDown.KeyW) fwd++
-  if (keysDown.KeyS) fwd--
-  if (keysDown.KeyD) right++
-  if (keysDown.KeyA) right--
-
-  fwd *= MOVE_SPEED
-  right *= MOVE_SPEED
-
-  let sin = Math.sin(camera.yaw), cos = Math.cos(camera.yaw)
-  camera.x += right * cos + fwd * sin
-  camera.z += right * sin - fwd * cos
-
   if (keysDown.Backquote === "press") {
     debugElem.classList.toggle("show", showDebug = !showDebug)
   }
@@ -231,10 +213,48 @@ function draw() {
   }
 }
 
+const GRAVITY = 0.2
+
+function processMovement() {
+  let blockBelow = getBlock(Math.round(camera.x), Math.round(camera.y - 2), Math.round(camera.z)),
+    blockInsideFeet = getBlock(Math.round(camera.x), Math.round(camera.y - 1), Math.round(camera.z))
+  if (blockBelow == null || blockBelow == 0) {
+    camera.y -= GRAVITY
+  }
+
+  if (blockInsideFeet) {
+    camera.y = Math.ceil(camera.y - 1)
+  }
+
+  const MOVE_SPEED = 0.5
+
+  camera.pitch = clamp(camera.pitch, -Math.PI / 2, Math.PI / 2)
+  camera.yaw %= 2 * Math.PI
+  while (camera.yaw < 0) camera.yaw += 2 * Math.PI
+
+  if (keysDown[keybinds.jump.key]) camera.y += MOVE_SPEED
+  if (keysDown.ShiftLeft) camera.y -= MOVE_SPEED
+
+  let fwd = 0, right = 0
+  let sin = Math.sin(camera.yaw), cos = Math.cos(camera.yaw)
+
+  // if (keysDown.KeyW && !getBlock(Math.round(camera.x + cos + sin), Math.round(camera.y), Math.round(camera.z + sin - cos))) fwd++
+  if (keysDown[keybinds.walkFwd.key]) fwd++
+  if (keysDown[keybinds.walkBkwd.key]) fwd--
+  if (keysDown[keybinds.walkRight.key]) right++
+  if (keysDown[keybinds.walkLeft.key]) right--
+
+  fwd *= MOVE_SPEED
+  right *= MOVE_SPEED
+  camera.x += right * cos + fwd * sin
+  camera.z += right * sin - fwd * cos
+}
+
 function loaded() {
   setup()
   setInterval(() => {
     processKeys()
+    processMovement()
     draw()
   }, 1000 / 60)
 }
