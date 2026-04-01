@@ -51,23 +51,23 @@ onmousemove = e => {
 
 let keybinds = {
   walkFwd: {
-    default: "w",
+    default: "KeyW",
     desc: "Walk Forward"
   },
   walkBkwd: {
-    default: "s",
+    default: "KeyS",
     desc: "Walk Backward"
   },
   walkLeft: {
-    default: "a",
+    default: "KeyA",
     desc: "Walk Left"
   },
   walkRight: {
-    default: "d",
+    default: "KeyD",
     desc: "Walk Right"
   },
   jump: {
-    default: " ",
+    default: "Space",
     desc: "Jump"
   }
 }
@@ -80,7 +80,7 @@ let keysDown = {}
 onkeydown = e => {
   if (e.metaKey || e.repeat) return
 
-  keysDown[e.key] = "press"
+  keysDown[e.code] = "press"
 
   if (e.code === "Escape") {
     e.preventDefault()
@@ -89,7 +89,7 @@ onkeydown = e => {
 }
 
 onkeyup = e => {
-  keysDown[e.key] = false
+  keysDown[e.code] = false
 }
 
 function processKeys() {
@@ -216,15 +216,15 @@ function draw() {
 const GRAVITY = 0.2
 
 function processMovement() {
-  let blockBelow = getBlock(Math.round(camera.x), Math.round(camera.y - 2), Math.round(camera.z)),
-    blockInsideFeet = getBlock(Math.round(camera.x), Math.round(camera.y - 1), Math.round(camera.z))
-  if (blockBelow == null || blockBelow == 0) {
-    camera.y -= GRAVITY
-  }
+  // let blockBelow = getBlock(Math.round(camera.x), Math.round(camera.y - 2), Math.round(camera.z)),
+  //   blockInsideFeet = getBlock(Math.round(camera.x), Math.round(camera.y - 1), Math.round(camera.z))
+  // if (blockBelow == null || blockBelow == 0) {
+  //   camera.y -= GRAVITY
+  // }
 
-  if (blockInsideFeet) {
-    camera.y = Math.ceil(camera.y - 1)
-  }
+  // if (blockInsideFeet) {
+  //   camera.y = Math.ceil(camera.y - 1)
+  // }
 
   const MOVE_SPEED = 0.5
 

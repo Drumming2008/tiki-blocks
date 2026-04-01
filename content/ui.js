@@ -114,7 +114,7 @@ function setInputWidth(input) {
 }
 
 function setKeybindValue(input, value, k) {
-  input.value = value.toUpperCase().replace(" ", "SPACE").replace("ALT", "OPTION").replace("META", "COMMAND").replace("BACKSPACE", "DELETE")
+  input.value = value.replace("Key", "").replace("Digit", "")
   keybinds[k].key = value
   setInputWidth(input)
 }
@@ -131,7 +131,7 @@ function createKeybind(v, k) {
   let input = document.createElement("input")
   input.onkeydown = e => {
     e.preventDefault()
-    setKeybindValue(input, e.key, k)
+    setKeybindValue(input, e.code, k)
   }
   wrapper.append(input)
   setKeybindValue(input, v.default, k)
