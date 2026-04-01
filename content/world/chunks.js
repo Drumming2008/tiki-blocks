@@ -148,21 +148,19 @@ async function loadChunk(x, z) {
       let otherH = px.sampleHeightmap(0, z)
 
       for (let y = 0; y <= ownH; y++) {
-        let data = blocksById[chunk.getBlock(CHUNK_SIZE - 1, y, z)]
-        if (data.invisible) continue
-        if (y <= otherH && !blocksById[px.getBlock(0, y, z)].transparent) continue
+        let face = blocksById[chunk.getBlock(CHUNK_SIZE - 1, y, z)].model.faces?.px
+        if (!face) continue
+        if (y <= otherH && blocksById[px.getBlock(0, y, z)].model.faces?.nx) continue
 
-        let tex = blockTextureIndices[data.texture]
-        pxFaces.push(blockDataXZ | y | tex << 24 | 2 << 18)
+        pxFaces.push(blockDataXZ | y | face)
       }
 
       for (let y = 0; y <= otherH; y++) {
-        let data = blocksById[px.getBlock(0, y, z)]
-        if (data.invisible) continue
-        if (y <= ownH && !blocksById[chunk.getBlock(CHUNK_SIZE - 1, y, z)].transparent) continue
+        let face = blocksById[px.getBlock(0, y, z)].model.faces?.nx
+        if (!face) continue
+        if (y <= ownH && blocksById[chunk.getBlock(CHUNK_SIZE - 1, y, z)].model.faces?.px) continue
 
-        let tex = blockTextureIndices[data.texture]
-        otherFaces.push(otherBlockDataXZ | y | tex << 24 | 3 << 18)
+        otherFaces.push(otherBlockDataXZ | y | face)
       }
     }
 
@@ -181,21 +179,19 @@ async function loadChunk(x, z) {
       let otherH = nx.sampleHeightmap(CHUNK_SIZE - 1, z)
 
       for (let y = 0; y <= ownH; y++) {
-        let data = blocksById[chunk.getBlock(0, y, z)]
-        if (data.invisible) continue
-        if (y <= otherH && !blocksById[nx.getBlock(CHUNK_SIZE - 1, y, z)].transparent) continue
+        let face = blocksById[chunk.getBlock(0, y, z)].model.faces?.nx
+        if (!face) continue
+        if (y <= otherH && blocksById[nx.getBlock(CHUNK_SIZE - 1, y, z)].model.faces?.px) continue
 
-        let tex = blockTextureIndices[data.texture]
-        nxFaces.push(blockDataXZ | y | tex << 24 | 3 << 18)
+        nxFaces.push(blockDataXZ | y | face)
       }
 
       for (let y = 0; y <= otherH; y++) {
-        let data = blocksById[nx.getBlock(CHUNK_SIZE - 1, y, z)]
-        if (data.invisible) continue
-        if (y <= ownH && !blocksById[chunk.getBlock(0, y, z)].transparent) continue
+        let face = blocksById[nx.getBlock(CHUNK_SIZE - 1, y, z)].model.faces?.px
+        if (!face) continue
+        if (y <= ownH && blocksById[chunk.getBlock(0, y, z)].model.faces?.nx) continue
 
-        let tex = blockTextureIndices[data.texture]
-        otherFaces.push(otherBlockDataXZ | y | tex << 24 | 2 << 18)
+        otherFaces.push(otherBlockDataXZ | y | face)
       }
     }
 
@@ -214,21 +210,19 @@ async function loadChunk(x, z) {
       let otherH = pz.sampleHeightmap(x, 0)
 
       for (let y = 0; y <= ownH; y++) {
-        let data = blocksById[chunk.getBlock(x, y, CHUNK_SIZE - 1)]
-        if (data.invisible) continue
-        if (y <= otherH && !blocksById[pz.getBlock(x, y, 0)].transparent) continue
+        let face = blocksById[chunk.getBlock(x, y, CHUNK_SIZE - 1)].model.faces?.pz
+        if (!face) continue
+        if (y <= otherH && blocksById[pz.getBlock(x, y, 0)].model.faces?.nz) continue
 
-        let tex = blockTextureIndices[data.texture]
-        pzFaces.push(blockDataXZ | y | tex << 24 | 4 << 18)
+        pzFaces.push(blockDataXZ | y | face)
       }
 
       for (let y = 0; y <= otherH; y++) {
-        let data = blocksById[pz.getBlock(x, y, 0)]
-        if (data.invisible) continue
-        if (y <= ownH && !blocksById[chunk.getBlock(x, y, CHUNK_SIZE - 1)].transparent) continue
+        let face = blocksById[pz.getBlock(x, y, 0)].model.faces?.nz
+        if (!face) continue
+        if (y <= ownH && blocksById[chunk.getBlock(x, y, CHUNK_SIZE - 1)].model.faces?.pz) continue
 
-        let tex = blockTextureIndices[data.texture]
-        otherFaces.push(otherBlockDataXZ | y | tex << 24 | 5 << 18)
+        otherFaces.push(otherBlockDataXZ | y | face)
       }
     }
 
@@ -247,21 +241,19 @@ async function loadChunk(x, z) {
       let otherH = nz.sampleHeightmap(x, CHUNK_SIZE - 1)
 
       for (let y = 0; y <= ownH; y++) {
-        let data = blocksById[chunk.getBlock(x, y, 0)]
-        if (data.invisible) continue
-        if (y <= otherH && !blocksById[nz.getBlock(x, y, CHUNK_SIZE - 1)].transparent) continue
+        let face = blocksById[chunk.getBlock(x, y, 0)].model.faces?.nz
+        if (!face) continue
+        if (y <= otherH && blocksById[nz.getBlock(x, y, CHUNK_SIZE - 1)].model.faces?.pz) continue
 
-        let tex = blockTextureIndices[data.texture]
-        nzFaces.push(blockDataXZ | y | tex << 24 | 5 << 18)
+        nzFaces.push(blockDataXZ | y | face)
       }
 
       for (let y = 0; y <= otherH; y++) {
-        let data = blocksById[nz.getBlock(x, y, CHUNK_SIZE - 1)]
-        if (data.invisible) continue
-        if (y <= ownH && !blocksById[chunk.getBlock(x, y, 0)].transparent) continue
+        let face = blocksById[nz.getBlock(x, y, CHUNK_SIZE - 1)].model.faces?.pz
+        if (!face) continue
+        if (y <= ownH && blocksById[chunk.getBlock(x, y, 0)].model.faces?.nz) continue
 
-        let tex = blockTextureIndices[data.texture]
-        otherFaces.push(otherBlockDataXZ | y | tex << 24 | 4 << 18)
+        otherFaces.push(otherBlockDataXZ | y | face)
       }
     }
 
@@ -380,6 +372,7 @@ function saveAndDeleteChunk(chunk) {
   gl.deleteBuffer(chunk.faces.negBuffer)
 
   chunks.delete(chunk.key)
+  loadedChunks.delete(chunk.key)
 }
 
 function chunkKey(x, z) {

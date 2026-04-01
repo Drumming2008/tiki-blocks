@@ -2,78 +2,108 @@ const rawBlocks = {
   AIR: {
     id: 0,
     name: "Air",
-    transparent: true,
-    invisible: true
+    model: models.NONE
   },
   STONE_BRICKS: {
     id: 1,
     name: "Stone Bricks",
-    texture: "stone_bricks/1"
+    model: {
+      ...models.BLOCK,
+      $tex: "stone_bricks/1"
+    }
   },
   GRASS: {
     id: 2,
     name: "Grass",
-    texture: "grass_side",
-    textureTop: "grass_top",
-    textureBottom: "dirt"
+    model: {
+      ...models.THREE_TEX,
+      $top: "grass_top",
+      $side: "grass_side",
+      $bottom: "dirt"
+    }
   },
   DIRT: {
     id: 3,
     name: "Dirt",
-    texture: "dirt"
+    model: {
+      ...models.BLOCK,
+      $tex: "dirt"
+    }
   },
   ROCKY_DIRT: {
     id: 4,
     name: "Rocky Dirt",
-    texture: "rocky_dirt"
+    model: {
+      ...models.BLOCK,
+      $tex: "rocky_dirt"
+    }
   },
   BEDROCK: {
     id: 5,
     name: "Bedrock",
-    texture: "bedrock"
+    model: {
+      ...models.BLOCK,
+      $tex: "bedrock"
+    }
   },
   STONE: {
     id: 6,
     name: "Stone",
-    texture: "stone"
+    model: {
+      ...models.BLOCK,
+      $tex: "stone"
+    }
   },
   GRAVEL: {
     id: 7,
     name: "Gravel",
-    texture: "gravel"
+    model: {
+      ...models.BLOCK,
+      $tex: "gravel"
+    }
   },
   MUD: {
     id: 8,
     name: "Mud",
-    texture: "mud"
+    model: {
+      ...models.BLOCK,
+      $tex: "mud"
+    }
   },
   SAND: {
     id: 9,
     name: "Sand",
-    texture: "sand"
+    model: {
+      ...models.BLOCK,
+      $tex: "sand"
+    }
   },
   CHEESE_BRICKS: {
     id: 254,
     name: "Cheese Bricks",
-    texture: "cheese_bricks"
+    model: {
+      ...models.BLOCK,
+      $tex: "cheese_bricks"
+    }
   },
   CHEESE: {
     id: 255,
     name: "Cheese",
-    texture: "cheese"
+    model: {
+      ...models.BLOCK,
+      $tex: "cheese"
+    }
   }
 }
 
 const blocks = Object.values(rawBlocks)
 
-// ex. AIR -> 0, for block ID literals in code
-const Block = {}
-for (let key in rawBlocks) {
-  Block[key] = rawBlocks[key].id
-}
+const Block = {} // ex. AIR -> 0, for block ID literals in code
+const blocksById = {} // ex. 0 -> { name: "Air", ... }
 
-// ex. 0 -> { name: "Air", ... }
-const blocksById = {}
-for (let block of blocks) {
+for (let key in rawBlocks) {
+  let block = rawBlocks[key]
+
+  Block[key] = block.id
   blocksById[block.id] = block
 }

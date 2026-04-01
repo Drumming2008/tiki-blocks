@@ -2,8 +2,15 @@ const BLOCK_TEXTURE_SIZE = 16
 
 let blockTextureIndices = {} // texture name -> index
 
-let blockTextures = new Set(blocks.flatMap(b => [b.texture, b.textureTop, b.textureBottom]))
-blockTextures.delete(undefined)
+let blockTextures = new Set()
+for (let { model } of blocks) {
+  for (let part of model.parts) {
+    blockTextures.add(resolveModelTex(model, part.texTop))
+    blockTextures.add(resolveModelTex(model, part.texSide))
+    blockTextures.add(resolveModelTex(model, part.texBottom))
+  }
+}
+blockTextures.delete(null)
 blockTextures = [...blockTextures]
 
 for (let i = 0; i < blockTextures.length; i++) {
@@ -14,6 +21,8 @@ for (let i = 0; i < blockTextures.length; i++) {
     gl.texSubImage3D(gl.TEXTURE_2D_ARRAY, 0, 0, 0, i, BLOCK_TEXTURE_SIZE, BLOCK_TEXTURE_SIZE, 1, gl.RGBA, gl.UNSIGNED_BYTE, img)
   }))
 }
+
+computeModels()
 
 let blockTexture = createTexture(BLOCK_TEXTURE_SIZE, BLOCK_TEXTURE_SIZE, blockTextures.length, null, true)
 

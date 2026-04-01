@@ -1,4 +1,4 @@
-importScripts("../world/block_data.js", "../world/biome_data.js")
+importScripts("../world/model_data.js", "../world/models.js", "../world/block_data.js", "../world/biome_data.js")
 
 const DO_NOODLE_CAVES = false, DO_CHEESE_CAVES = false
 
@@ -20,32 +20,28 @@ function computeFaces({ blocks, heightmap }) {
 
       for (let y = 0; y <= height; y++) {
         let i = layerIndex + y * CHUNK_LAYER_LEN
-        let data = blocksById[blocks[i]]
-        if (data.invisible) continue
+        let { faces } = blocksById[blocks[i]].model
+        if (!faces) continue
 
-        let texSide = blockTextureIndices[data.texture]
         let blockData = blockDataXZ | y
-        let blockDataSide = blockData | texSide << 24
 
         if (y === height || isTransparent(blocks[i + CHUNK_LAYER_LEN])) {
-          let texTop = blockTextureIndices[data.textureTop] ?? texSide
-          py.push(blockData | texTop << 24)
+          py.push(blockData | faces.py)
         }
         if (y > 0 && isTransparent(blocks[i - CHUNK_LAYER_LEN])) {
-          let texBottom = blockTextureIndices[data.textureBottom] ?? texSide
-          ny.push(blockData | texBottom << 24 | 1 << 18)
+          ny.push(blockData | faces.ny)
         }
         if (x < CHUNK_SIZE - 1 && isTransparent(blocks[i + 1])) {
-          px.push(blockDataSide | 2 << 18)
+          px.push(blockData | faces.px)
         }
         if (x > 0 && isTransparent(blocks[i - 1])) {
-          nx.push(blockDataSide | 3 << 18)
+          nx.push(blockData | faces.nx)
         }
         if (z < CHUNK_SIZE - 1 && isTransparent(blocks[i + CHUNK_SIZE])) {
-          pz.push(blockDataSide | 4 << 18)
+          pz.push(blockData | faces.pz)
         }
         if (z > 0 && isTransparent(blocks[i - CHUNK_SIZE])) {
-          nz.push(blockDataSide | 5 << 18)
+          nz.push(blockData | faces.nz)
         }
       }
     }
@@ -130,5 +126,5 @@ function generateChunk(chunkX, chunkZ) {
 }
 
 function isTransparent(id) {
-  return blocksById[id].transparent
+  return !id // TODO
 }
