@@ -21,13 +21,13 @@ class Chunk {
 
     if (data) {
       this.setData(data)
-      this.loading = false
+      this.generating = false
     } else {
-      this.loading = true
+      this.generating = true
     }
   }
 
-  setData({ blocks, heightmap, faces }) {
+  setData({ blocks, heightmap, faces, time }) {
     this.blocks = blocks
     this.heightmap = heightmap
     // jsdoc jumpscare
@@ -35,7 +35,9 @@ class Chunk {
     this.faces = faces
     this.maxBlockHeight = Math.floor(blocks.length / CHUNK_LAYER_LEN)
 
-    this.loading = false
+    this.timing = { gen: time, mesh: faces.time }
+
+    this.generating = false
   }
 
   sampleHeightmap(x, z) {
@@ -54,9 +56,9 @@ class Chunk {
   }
 }
 
-function getChunk(x, z, includeLoading = false) {
+function getChunk(x, z, includeGenerating = false) {
   let chunk = chunks.get(chunkKey(x, z))
-  if (chunk?.loading && !includeLoading) return null
+  if (chunk?.generating && !includeGenerating) return null
   return chunk || null
 }
 
@@ -388,7 +390,7 @@ function drawChunks() {
   let unloaded = chunks.size > maxChunksInMemory ? [] : null
 
   for (let [key, chunk] of chunks.entries()) {
-    if (chunk.loading) continue
+    if (chunk.generating) continue
 
     if (!loadedChunks.has(key)) {
       if (unloaded) {

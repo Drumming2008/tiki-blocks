@@ -5,6 +5,8 @@ const DO_NOODLE_CAVES = false, DO_CHEESE_CAVES = false
 const paddingArray = Array(FACE_BUFFER_PADDING).fill(0)
 
 function computeFaces({ blocks, heightmap }) {
+  let start = performance.now()
+
   let py = [], ny = [], px = [], nx = [], pz = [], nz = []
 
   // tttttttt 0rrfffzz zzzxxxxx yyyyyyyy
@@ -53,11 +55,14 @@ function computeFaces({ blocks, heightmap }) {
     lengths: {
       pos: { x: px.length, y: py.length, z: pz.length, padding: FACE_BUFFER_PADDING },
       neg: { x: nx.length, y: ny.length, z: nz.length, padding: FACE_BUFFER_PADDING }
-    }
+    },
+    time: performance.now() - start
   }
 }
 
 function generateChunk(chunkX, chunkZ) {
+  let start = performance.now()
+
   let blockBuffer = new ArrayBuffer(CHUNK_LEN, { maxByteLength: CHUNK_LEN })
   let blocks = new Uint8Array(blockBuffer), heightmap = new Uint8Array(CHUNK_LAYER_LEN)
   let maxH = 0
@@ -122,7 +127,7 @@ function generateChunk(chunkX, chunkZ) {
     noise[name].clearCache()
   }
 
-  return { blocks, heightmap }
+  return { blocks, heightmap, time: performance.now() - start }
 }
 
 function isTransparent(id) {

@@ -3,7 +3,7 @@ const { mat4, glMatrix } = window.glMatrix
 const debugElem = document.getElementById("debug")
 let showDebug = false
 
-let camera = { x: -4, y: 100, z: 27, yaw: glMatrix.toRadian(325), pitch: glMatrix.toRadian(25) }
+let camera = { x: 0, y: 70, z: 0, yaw: glMatrix.toRadian(325), pitch: glMatrix.toRadian(25) }
 
 let paused = true, waitingToLock = false
 
@@ -167,13 +167,31 @@ function draw() {
     let blockId = getBlock(camX, camY, camZ)
     let chunk = getChunk(...getChunkPos(camX, camZ))
 
+    let chunkStatus = { loaded: 0, generating: 0, generated: 0 }
+    let genTime = 0, meshTime = 0
+
+    for (let chunk of chunks.values()) {
+      if (chunk.generating) {
+        chunkStatus.generating++
+      } else {
+        genTime += chunk.timing.gen
+        meshTime += chunk.timing.mesh
+        chunkStatus.generated++
+        if (loadedChunks.has(chunk.key)) chunkStatus.loaded++
+      }
+    }
+
+    genTime /= chunkStatus.generated
+    meshTime /= chunkStatus.generated
+
     debugElem.innerText = [
       `${lastFrameTimes.length} FPS`,
       "",
       `Pos: ${camera.x.toFixed(2)}, ${camera.y.toFixed(4)}, ${camera.z.toFixed(2)} (Block: ${camX}, ${camY}, ${camZ})`,
       `Yaw: ${glMatrix.toDegree(camera.yaw).toFixed(1)}, Pitch: ${glMatrix.toDegree(camera.pitch).toFixed(1)}`,
       "",
-      `Chunks: ${loadedChunks.size} loaded, ${chunks.size} total (${maxChunksInMemory} max), ${faceCount} faces drawn`,
+      `Generation: ${chunkStatus.generating} generating, ${genTime.toFixed(2)}ms gen, ${meshTime.toFixed(2)}ms mesh`,
+      `Chunks: ${chunkStatus.loaded} loaded, ${chunks.size} total (${maxChunksInMemory} max), ${faceCount} faces drawn`,
       `Chunk: ${chunk.x}, ${chunk.z} (Pos in chunk: ${camX - chunk.worldX}, ${camY}, ${camZ - chunk.worldZ})`,
       "",
       `Block: ${blockId !== null ? blocksById[blockId].name : "<none>"}`
