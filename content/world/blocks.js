@@ -4,10 +4,11 @@ let blockTextureIndices = {} // texture name -> index
 
 let blockTextures = new Set()
 for (let { model } of blocks) {
-  for (let part of model.parts) {
-    blockTextures.add(resolveModelTex(model, part.texTop))
-    blockTextures.add(resolveModelTex(model, part.texSide))
-    blockTextures.add(resolveModelTex(model, part.texBottom))
+  for (let { tex, texTop, texSide, texBottom } of model.parts) {
+    if (tex)       blockTextures.add(resolveModelTex(model, tex))
+    if (texTop)    blockTextures.add(resolveModelTex(model, texTop))
+    if (texSide)   blockTextures.add(resolveModelTex(model, texSide))
+    if (texBottom) blockTextures.add(resolveModelTex(model, texBottom))
   }
 }
 blockTextures.delete(null)

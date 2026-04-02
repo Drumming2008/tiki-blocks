@@ -78,6 +78,15 @@ const rawBlocks = {
       $tex: "sand"
     }
   },
+  SMALL_CHEESE: {
+    id: 253,
+    name: "Quesito",
+    model: {
+      parts: [
+        { x: 4, y: 4, z: 4, dx: 8, dy: 8, dz: 8, tex: "cheese" }
+      ]
+    }
+  },
   CHEESE_BRICKS: {
     id: 254,
     name: "Cheese Bricks",

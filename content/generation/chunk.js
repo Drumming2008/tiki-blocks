@@ -27,22 +27,22 @@ function computeFaces({ blocks, heightmap }) {
 
         let blockData = blockDataXZ | y
 
-        if (y === height || isTransparent(blocks[i + CHUNK_LAYER_LEN])) {
+        if (y === height || !blocksById[blocks[i + CHUNK_LAYER_LEN]].model.faces?.ny) {
           py.push(blockData | faces.py)
         }
-        if (y > 0 && isTransparent(blocks[i - CHUNK_LAYER_LEN])) {
+        if (y > 0 && !blocksById[blocks[i - CHUNK_LAYER_LEN]].model.faces?.py) {
           ny.push(blockData | faces.ny)
         }
-        if (x < CHUNK_SIZE - 1 && isTransparent(blocks[i + 1])) {
+        if (x < CHUNK_SIZE - 1 && !blocksById[blocks[i + 1]].model.faces?.nx) {
           px.push(blockData | faces.px)
         }
-        if (x > 0 && isTransparent(blocks[i - 1])) {
+        if (x > 0 && !blocksById[blocks[i - 1]].model.faces?.px) {
           nx.push(blockData | faces.nx)
         }
-        if (z < CHUNK_SIZE - 1 && isTransparent(blocks[i + CHUNK_SIZE])) {
+        if (z < CHUNK_SIZE - 1 && !blocksById[blocks[i + CHUNK_SIZE]].model.faces?.nz) {
           pz.push(blockData | faces.pz)
         }
-        if (z > 0 && isTransparent(blocks[i - CHUNK_SIZE])) {
+        if (z > 0 && !blocksById[blocks[i - CHUNK_SIZE]].model.faces?.pz) {
           nz.push(blockData | faces.nz)
         }
       }
@@ -114,6 +114,11 @@ function generateChunk(chunkX, chunkZ) {
 
           if (density <= -1) break
         }
+      }
+
+      if (!worldX && !worldZ) {
+        blocks[layerIndex + 69 * CHUNK_LAYER_LEN] = Block.SMALL_CHEESE
+        maxY = 69
       }
 
       heightmap[layerIndex] = maxY

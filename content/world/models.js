@@ -5,9 +5,10 @@ function computeModels() {
 }
 
 function computeModel(model) {
-  if (model.mesh) return
+  if (model.computed) return
+  model.computed = true
 
-  let mesh = model.mesh = [] // TODO
+  let mesh = []
   let faces = {}
 
   for (let part of model.parts) {
@@ -15,9 +16,10 @@ function computeModel(model) {
 
     let { x, y, z, dx, dy, dz } = part
 
-    let texTop = blockTextureIndices[resolveModelTex(model, part.texTop)]
-    let texSide = blockTextureIndices[resolveModelTex(model, part.texSide)]
-    let texBottom = blockTextureIndices[resolveModelTex(model, part.texBottom)]
+    let tex       = part.tex      && blockTextureIndices[resolveModelTex(model, part.tex      )]
+    let texTop    = part.texTop    ? blockTextureIndices[resolveModelTex(model, part.texTop   )] : tex
+    let texSide   = part.texSide   ? blockTextureIndices[resolveModelTex(model, part.texSide  )] : tex
+    let texBottom = part.texBottom ? blockTextureIndices[resolveModelTex(model, part.texBottom)] : tex
 
     let fullSizeY = !x && !z && dx === 16 && dz === 16
 
@@ -26,6 +28,8 @@ function computeModel(model) {
     if (texTop) {
       if (fullSizeY && y + dy === 16) {
         faces.py = texTop << 24
+      } else if (dx && dz) {
+        mesh.push(x, y, z, x + dx, y, z, x + dx, y, z + dz, x + dx, y, z, x + dx, y, z + dz, x, y, z + dz)
       }
     }
     if (texBottom) {
@@ -47,6 +51,9 @@ function computeModel(model) {
     }
   }
 
+  if (mesh.length) {
+    model.mesh = new Float32Array(mesh)
+  }
   if (Object.keys(faces).length) {
     model.faces = faces
   }

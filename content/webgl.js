@@ -26,6 +26,8 @@ onresize = resizeCanvas
 
 const SHADER_PREFIX = "#version 300 es\nprecision highp float;\nprecision highp int;\n\n"
 
+const includeShaders = {}
+
 async function loadShaderProgram(name) {
   let [vs, fs, { attributes, uniforms }] = await Promise.all([
     fetch(`./shaders/${name}.vsh`).then(res => res.text()),
@@ -35,24 +37,33 @@ async function loadShaderProgram(name) {
 
   let program = gl.createProgram()
 
-  for (let [source, type, typeStr] of [
-    [vs, gl.VERTEX_SHADER, "vertex"],
-    [fs, gl.FRAGMENT_SHADER, "fragment"]
-  ]) {
+  async function loadShader(source, type, typeStr) {
     let shader = gl.createShader(type)
+
+    await Promise.all(
+      source.matchAll(/^#include +([^\n]+)\s*$/gm)
+            .map(async ([match, name]) => {
+              let request = includeShaders[name] ||= fetch(`./shaders/include/${name}`).then(res => res.text())
+              source = source.replace(match, await request)
+            })
+    )
 
     gl.shaderSource(shader, SHADER_PREFIX + source)
     gl.compileShader(shader)
 
     if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-      console.log(`!!! ${typeStr} shader ${typeStr} died !!!`)
       console.log(gl.getShaderInfoLog(shader))
       gl.deleteShader(shader)
-      return
+      return Promise.reject(`!!! ${name} ${typeStr} shader died !!!`)
     }
 
     gl.attachShader(program, shader)
   }
+
+  await Promise.all([
+    loadShader(vs, gl.VERTEX_SHADER, "vertex"),
+    loadShader(fs, gl.FRAGMENT_SHADER, "fragment")
+  ])
 
   gl.linkProgram(program)
 

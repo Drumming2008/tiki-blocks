@@ -1,5 +1,5 @@
 /*
-face data packing:
+block face data packing:
 
 tttttttt 0rrfffzz zzzxxxxx yyyyyyyy
 
@@ -9,6 +9,8 @@ r = texture rotation (ccw)
 t = texture index
 */
 
+#include world.vsh
+
 const float[] FACE_BRIGHTNESS = float[](
     1.0, 0.55, 0.8, 0.8, 0.65, 0.65
 );
@@ -16,20 +18,8 @@ const float[] FACE_BRIGHTNESS = float[](
 in int a_data;
 in int a_corner;
 
-uniform vec3 u_cameraPos;
-uniform ivec2 u_offset;
-uniform float u_renderDistance;
-
-uniform mat4 u_viewMat;
-uniform mat4 u_projectionMat;
-
 out vec3 v_texPos;
 out float v_brightness;
-out float v_fog;
-
-float fogStrength(float dist) {
-    return smoothstep(0.9, 1.0, dist / u_renderDistance);
-}
 
 void main() {
     int data = a_data;
@@ -60,12 +50,12 @@ void main() {
         pos.y += cornerOffset.y;
     }
 
-    gl_Position = u_projectionMat * u_viewMat * vec4(pos, 1);
-
     int texCorner = (a_corner ^ (a_corner >> 1)) + rot;
     int texY = (texCorner >> 1) & 1;
     v_texPos = vec3((texCorner & 1) ^ texY, 1 - texY, tex);
 
     v_brightness = FACE_BRIGHTNESS[face];
-    v_fog = fogStrength(distance(vec3(pos), u_cameraPos));
+
+    setPos(pos);
+    setFog(pos);
 }
